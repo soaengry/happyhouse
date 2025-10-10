@@ -130,7 +130,7 @@
                  WHERE hd.apt_code = hi.apt_code
                  ORDER BY hd.no DESC
                      LIMIT 18446744073709551615) hh
-        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{gugunCode}, 1, 2)
+        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
           AND apt_name LIKE CONCAT('%', #{keyword}, '%')
         GROUP BY apt_code
             LIMIT #{limit} OFFSET #{offset};
@@ -140,7 +140,7 @@
     <select id="getSidoKeywordDealCount" parameterType="map" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
-        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{gugunCode}, 1, 2)
+        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
           AND apt_name LIKE CONCAT('%', #{keyword}, '%');
     </select>
 
