@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,11 +70,20 @@ public class HouseController {
             }
         }
 
-        if (response.getHouseList() != null) {
-            response.setResult(SUCCESS);
-        } else {
-            response.setResult(FAIL);
-        }
+        response.setResult(response.getHouseList() != null ? SUCCESS : FAIL);
+
+        return response.getResult() > 0 ?
+                new ResponseEntity<>(response, HttpStatus.OK) :
+                new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/{aptCode}")
+    public ResponseEntity<HouseResponseDto> getHouseDealList(@PathVariable Integer aptCode) {
+        HouseResponseDto response = new HouseResponseDto();
+
+        response.setHouseList(service.getHouseDealList(aptCode));
+        response.setCount(service.getHouseDealCount(aptCode));
+        response.setResult(response.getHouseList() != null ? SUCCESS : FAIL);
 
         return response.getResult() > 0 ?
                 new ResponseEntity<>(response, HttpStatus.OK) :
