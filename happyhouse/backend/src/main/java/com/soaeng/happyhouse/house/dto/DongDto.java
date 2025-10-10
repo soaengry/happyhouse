@@ -9,10 +9,6 @@ public class DongDto {
 
     private long dongCode;
 
-    private String sidoName;
-
-    private String gugunName;
-
     private String dongName;
 
 }

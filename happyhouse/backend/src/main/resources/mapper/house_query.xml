@@ -21,8 +21,8 @@
     <select id="getGugunList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.GugunDto">
         SELECT gugun_code, gugun_name
         FROM gugun_code
-        JOIN sido_code
-        ON SUBSTRING(gugun_code, 1, 2) = SUBSTRING(sido_code, 1, 2)
+                 JOIN sido_code
+                      ON SUBSTRING(gugun_code, 1, 2) = SUBSTRING(sido_code, 1, 2)
         WHERE sido_code = #{sidoCode}
         ORDER BY gugun_name;
     </select>
@@ -31,8 +31,8 @@
     <select id="getDongList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.DongDto">
         SELECT dong_code, dong_name
         FROM dong_code AS dc
-        JOIN gugun_code AS gc
-        ON dc.gugun_name = gc.gugun_name
+                 JOIN gugun_code AS gc
+                      ON dc.gugun_name = gc.gugun_name
         WHERE gugun_code = #{gugunCode}
         ORDER BY dong_name;
     </select>
@@ -40,16 +40,24 @@
 
     <!--  # 매물별 최근 거래 목록 -->
     <!--  전체  -->
-    <select id="getAllDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getAllDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  전체 총 수  -->
@@ -58,18 +66,55 @@
         FROM house_info;
     </select>
 
-    <!--  구/군  -->
-    <select id="getGugunDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <!--  시/도  -->
+    <select id="getSidoDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
+        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
+        GROUP BY apt_code
+            LIMIT #{limit}
+        OFFSET #{offset};
+    </select>
+
+    <!--  시/도 총 수  -->
+    <select id="getSidoDealCount" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT apt_code)
+        FROM house_info
+        WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2);
+    </select>
+
+    <!--  구/군  -->
+    <select id="getGugunDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+        SELECT *
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  구/군 총 수  -->
@@ -80,17 +125,25 @@
     </select>
 
     <!--  동별 아파트 총 수  -->
-    <select id="getDongDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getDongDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE dong_code = #{dongCode}
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  동 총 수  -->
@@ -101,17 +154,25 @@
     </select>
 
     <!--  매물명 검색 목록  -->
-    <select id="getKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE apt_name LIKE CONCAT('%', #{keyword}, '%')
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  아파트 검색 총 수  -->
@@ -122,18 +183,26 @@
     </select>
 
     <!--  시 아파트 검색 목록  -->
-    <select id="getSidoKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getSidoKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-                 SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-                 FROM house_deal hd, house_info hi
-                 WHERE hd.apt_code = hi.apt_code
-                 ORDER BY hd.no DESC
-                     LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
           AND apt_name LIKE CONCAT('%', #{keyword}, '%')
         GROUP BY apt_code
-            LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  시 아파트 검색 총 수  -->
@@ -145,18 +214,26 @@
     </select>
 
     <!--  구/군 아파트 검색 목록  -->
-    <select id="getGugunKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getGugunKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
-            AND apt_name LIKE CONCAT('%', #{keyword}, '%')
+          AND apt_name LIKE CONCAT('%', #{keyword}, '%')
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
 
     <!--  구/군 아파트 검색 총 수  -->
@@ -164,39 +241,59 @@
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
-            AND apt_name LIKE CONCAT('%', #{keyword}, '%');
+          AND apt_name LIKE CONCAT('%', #{keyword}, '%');
     </select>
 
     <!--  동 아파트 검색 목록  -->
-    <select id="getDongKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getDongKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
-        FROM (
-            SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-            FROM house_deal hd, house_info hi
-            WHERE hd.apt_code = hi.apt_code
-            ORDER BY hd.no DESC
-            LIMIT 18446744073709551615) hh
+        FROM (SELECT hd.no,
+                     hi.apt_code,
+                     hi.apt_name,
+                     hi.dong_code,
+                     hd.deal_year,
+                     hd.deal_month,
+                     hd.deal_day,
+                     hd.deal_amount
+              FROM house_deal hd,
+                   house_info hi
+              WHERE hd.apt_code = hi.apt_code
+              ORDER BY hd.no DESC LIMIT 18446744073709551615) hh
         WHERE dong_code = #{dongCode}
-            AND apt_name LIKE CONCAT('%', #{keyword}, '%')
+          AND apt_name LIKE CONCAT('%', #{keyword}, '%')
         GROUP BY apt_code
-        LIMIT #{limit} OFFSET #{offset};
+            LIMIT #{limit}
+        OFFSET #{offset};
     </select>
     <!--  동 아파트 검색 총 수  -->
     <select id="getDongKeywordDealCount" parameterType="map" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE dong_code = #{dongCode}
-            AND apt_name LIKE CONCAT('%', #{keyword}, '%');
+          AND apt_name LIKE CONCAT('%', #{keyword}, '%');
     </select>
 
 
     <!--  # 거래 목록  -->
     <!--  아파트별 거래 상세 목록  -->
     <select id="getHouseDealList" parameterType="int" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
-        SELECT hd.no, hi.apt_code, hi.apt_name, hi.dong_code, hd.area, hd.floor, hi.lat, hi.lng, hd.deal_year, hd.deal_month, hd.deal_day, hd.deal_amount
-        FROM house_deal hd, house_info hi
+        SELECT hd.no,
+               hi.apt_code,
+               hi.apt_name,
+               hi.dong_code,
+               hd.area,
+               hd.floor,
+               hi.lat,
+               hi.lng,
+               hd.deal_year,
+               hd.deal_month,
+               hd.deal_day,
+               hd.deal_amount
+        FROM house_deal hd,
+             house_info hi
         WHERE hd.apt_code = hi.apt_code
-            AND hd.apt_code = #{aptCode}
+          AND hd.apt_code = #{aptCode}
         ORDER BY hd.no DESC;
     </select>
 

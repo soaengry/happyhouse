@@ -55,6 +55,19 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
+    public List<HouseDto> getSidoDealList(HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getAllDealList(param);
+        setBaseAddressList(houseDtoList);
+
+        return houseDtoList;
+    }
+
+    @Override
+    public int getSidoDealCount(Long sidoCode) {
+        return houseDao.getSidoDealCount(sidoCode);
+    }
+
+    @Override
     public List<HouseDto> getGugunDealList(HouseParamDto param) {
         List<HouseDto> houseDtoList = houseDao.getGugunDealList(param);
         setBaseAddressList(houseDtoList);

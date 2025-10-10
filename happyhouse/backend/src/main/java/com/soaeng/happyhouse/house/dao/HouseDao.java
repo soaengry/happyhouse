@@ -31,36 +31,49 @@ public interface HouseDao {
     /* 매물별 최근 거래 목록 */
     // 전체
     List<HouseDto> getAllDealList(HouseParamDto param);
+
     int getAllDealCount();
+
+    // 시/도
+    List<HouseDto> getSidoDealList(HouseParamDto param);
+
+    int getSidoDealCount(Long sidoCode);
 
     // 구/군
     List<HouseDto> getGugunDealList(HouseParamDto param);
+
     int getGugunDealCount(Long gugunCode);
 
     // 동
     List<HouseDto> getDongDealList(HouseParamDto param);
+
     int getDongDealCount(Long dongCode);
 
     // 매물명 검색
     List<HouseDto> getKeywordDealList(HouseParamDto param);
+
     int getKeywordDealCount(String keyword);
 
     // 시 매물명 검색
     List<HouseDto> getSidoKeywordDealList(HouseParamDto param);
+
     int getSidoKeywordDealCount(Map<String, Object> param);
 
     // 구/군 매물명 검색
     List<HouseDto> getGugunKeywordDealList(HouseParamDto param);
+
     int getGugunKeywordDealCount(Map<String, Object> param);
 
     // 동별 매물명 검색
     List<HouseDto> getDongKeywordDealList(HouseParamDto param);
+
     int getDongKeywordDealCount(Map<String, Object> param);
 
 
     /* 거래 상세 */
     // 매물별 거래 상세 목록
     List<HouseDto> getHouseDealList(Integer aptCode);
+
     int getHouseDealCount(Integer aptCode);
 
 }
