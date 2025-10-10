@@ -1,5 +1,6 @@
 package com.soaeng.happyhouse.house.dto.response;
 
+import com.soaeng.happyhouse.house.dto.BaseAddressDto;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -45,5 +46,13 @@ public class HouseDto {
 
     // 법정동
     private String address;
+
+    public void setAddress(BaseAddressDto baseAddressDto) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseAddressDto.getSidoName()).append(" ");
+        sb.append(baseAddressDto.getGugunName()).append(" ");
+        sb.append(baseAddressDto.getDongName());
+        this.address = sb.toString();
+    }
 
 }
