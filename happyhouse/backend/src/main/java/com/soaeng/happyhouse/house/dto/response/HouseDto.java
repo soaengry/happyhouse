@@ -20,6 +20,9 @@ public class HouseDto {
     // 동 코드
     private long dongCode;
 
+    // 건축연도
+    private int buildYear;
+
     // 면적
     private String area;
 
