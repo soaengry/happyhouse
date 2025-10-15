@@ -35,35 +35,30 @@ public class HouseController {
 
         if (param.getKeyword() != null) {
             if (param.getDongCode() > 0) {
-                log.info("[getHouseList] 동, 검색어");
                 response.setHouseList(service.getDongKeywordDealList(param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("dongCode", param.getDongCode());
                 map.put("keyword", param.getKeyword());
                 response.setCount(service.getDongKeywordDealCount(map));
             } else if (param.getGugunCode() > 0) {
-                log.info("[getHouseList] 구군, 검색어");
                 response.setHouseList(service.getGugunKeywordDealList(param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("gugunCode", param.getGugunCode());
                 map.put("keyword", param.getKeyword());
                 response.setCount(service.getGugunKeywordDealCount(map));
             } else if (param.getSidoCode() > 0) {
-                log.info("[getHouseList] 시도, 검색어");
                 response.setHouseList(service.getSidoKeywordDealList(param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("sidoCode", param.getSidoCode());
                 map.put("keyword", param.getKeyword());
                 response.setCount(service.getSidoKeywordDealCount(map));
             } else {
-                log.info("[getHouseList] 검색어");
                 response.setHouseList(service.getKeywordDealList(param));
                 response.setCount(service.getKeywordDealCount(param.getKeyword()));
             }
         } else {
             if (param.getDongCode() > 0) {
                 response.setHouseList(service.getDongDealList(param));
-                log.info(response.getHouseList().toString());
                 response.setCount(service.getDongDealCount(param.getDongCode()));
             } else if (param.getGugunCode() > 0) {
                 response.setHouseList(service.getGugunDealList(param));
@@ -73,9 +68,7 @@ public class HouseController {
                 response.setCount(service.getSidoDealCount(param.getSidoCode()));
             } else {
                 List<HouseDto> houseList = service.getAllDealList(param);
-                log.info(service.getAllDealList(param).toString());
                 response.setHouseList(houseList);
-                log.info(response.getHouseList().toString());
                 response.setCount(service.getAllDealCount());
             }
         }
