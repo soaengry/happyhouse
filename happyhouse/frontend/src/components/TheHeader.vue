@@ -1,15 +1,17 @@
 <template>
-  <header
-    class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow"
-  >
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">HAPPY HOUSE</a>
+  <header>
+    <h1>HAPPY HOUSE</h1>
+    <TheNavbar />
   </header>
 </template>
 
 <script>
+import TheNavbar from "./TheNavbar.vue";
+
 export default {
+  components: { TheNavbar },
   name: "TheHeader",
 };
 </script>
 
-<style></style>
+<style scoped></style>

@@ -1,7 +1,23 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
+/* import the fontawesome core */
+import { library } from "@fortawesome/fontawesome-svg-core";
 
+/* import font awesome icon component */
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+/* import icons and add them to the Library */
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { createPinia } from "pinia";
+
+library.add(faMagnifyingGlass);
+
+const pinia = createPinia();
 const app = createApp(App);
 
-app.use(router).mount("#app");
+app
+  .use(pinia)
+  .use(router)
+  .component("font-awesome-icon", FontAwesomeIcon)
+  .mount("#app");

@@ -1,18 +1,25 @@
 import api from ".";
 
-export default {
-  async getAllDealList() {
-    const params = {
-      limit: 10,
-      offset: 0,
-    };
-    try {
-      const res = await api.get("/house", { params });
-      console.log(res.data); // 여기서 확인
-      return res.data; // 반드시 data 반환
-    } catch (err) {
-      console.error(err);
-      return []; // 에러 시 빈 배열 반환
-    }
+const houseService = {
+  // 매물 리스트 조회
+  async getHouseList({
+    limit,
+    offset,
+    sidoCode,
+    gugunCode,
+    dongCode,
+    keyword,
+  }) {
+    const params = { limit, offset, sidoCode, gugunCode, dongCode, keyword };
+    const { data } = await api.get("/house", { params });
+    return data; // { count: number, houseList: [...], result: number }
+  },
+
+  // 특정 매물 거래 내역 조회
+  async getDealList(aptCode) {
+    const { data } = await api.get(`/house/${aptCode}`);
+    return data; // { count: number, houseList: [...], result: number }
   },
 };
+
+export default houseService;

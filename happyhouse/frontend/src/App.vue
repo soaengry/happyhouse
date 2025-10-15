@@ -1,8 +1,9 @@
 <template>
   <div id="app">
-    <TheHeader />
     <div id="wrapper">
-      <TheNavbar />
+      <div>
+        <TheHeader />
+      </div>
       <main id="content-wrapper">
         <RouterView />
       </main>
@@ -12,11 +13,10 @@
 
 <script>
 import TheHeader from "./components/TheHeader.vue";
-import TheNavbar from "./components/TheNavbar.vue";
 
 export default {
   name: "App",
-  components: { TheHeader, TheNavbar },
+  components: { TheHeader },
 };
 </script>
 
