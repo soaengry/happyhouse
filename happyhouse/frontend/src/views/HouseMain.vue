@@ -46,13 +46,10 @@
         class="form-control"
         type="text"
         placeholder="아파트명"
+        @keydown.enter="onSearch"
       />
       <!-- 검색 버튼 -->
-      <button
-        class="btn btn-primary"
-        type="button"
-        @click="houseStore.fetchHouseList"
-      >
+      <button class="btn btn-primary" type="button" @click="onSearch">
         <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
       </button>
     </fieldset>
@@ -139,9 +136,11 @@ import { useHouseStore } from "@/stores/houseStore";
 import { useAddressStore } from "@/stores/addressStore";
 import ThePagination from "@/components/ThePagination.vue";
 import { makeDateStr } from "@/utils/date";
+import { usePaginationStore } from "@/stores/paginationStore";
 
 const houseStore = useHouseStore();
 const addressStore = useAddressStore();
+const paginationStore = usePaginationStore();
 
 const { count, houseList, sidoCode, gugunCode, dongCode, keyword, isLoading } =
   storeToRefs(houseStore);
@@ -177,6 +176,11 @@ function onChangeGugun() {
 // 페이지 변경 시
 function onPageChanged() {
   houseStore.fetchHouseList();
+}
+
+function onSearch() {
+  houseStore.fetchHouseList();
+  paginationStore.currentPageIndex = 1;
 }
 </script>
 <style scoped>
