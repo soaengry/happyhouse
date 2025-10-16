@@ -1,24 +1,21 @@
 import { defineStore } from "pinia";
-import api from "@/services/addressService";
+import addressService from "@/services/addressService";
 
 export const useAddressStore = defineStore("address", {
   state: () => ({
     sidoList: [],
-    sidoCode: 0,
     gugunList: [],
-    gugunCode: 0,
     dongList: [],
-    dongCode: 0,
   }),
   actions: {
     async getSidoList() {
-      this.sidoList = await api.getSidoList();
+      this.sidoList = await addressService.getSidoList();
     },
-    async getGugunList() {
-      this.gugunList = await api.getGugunList(this.sidoCode);
+    async getGugunList({ sidoCode }) {
+      this.gugunList = await addressService.getGugunList(sidoCode);
     },
-    async getDongList() {
-      this.dongList = await api.getDongList(this.gugunCode);
+    async getDongList({ gugunCode }) {
+      this.dongList = await addressService.getDongList(gugunCode);
     },
   },
 });

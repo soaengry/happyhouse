@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import api from "@/services/houseService";
+import houseService from "@/services/houseService";
 
 export const useHouseStore = defineStore("house", {
   state: () => ({
@@ -28,7 +28,7 @@ export const useHouseStore = defineStore("house", {
         gugunCode: this.gugunCode,
         dongCode: this.dongCode,
       };
-      const { count, houseList } = await api.getHouseList(params);
+      const { count, houseList } = await houseService.getHouseList(params);
       this.houseList = houseList;
       this.count = count;
     },

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useHouseStore } from "@/stores/houseStore";
 import { useAddressStore } from "@/stores/addressStore";
@@ -7,16 +7,36 @@ import { useAddressStore } from "@/stores/addressStore";
 const houseStore = useHouseStore();
 const addressStore = useAddressStore();
 
-const { count, houseList } = storeToRefs(houseStore);
-const { sido, gugun, dong, sidoList, gugunList, dongList } =
-  storeToRefs(addressStore);
-
-const keyword = ref("");
+const { count, houseList, sidoCode, gugunCode, dongCode, keyword } =
+  storeToRefs(houseStore);
+const { sidoList, gugunList, dongList } = storeToRefs(addressStore);
 
 onMounted(async () => {
   await addressStore.getSidoList();
   await houseStore.fetchHouseList();
 });
+
+// 시/도 선택필드 변경 시
+function onChangeSido() {
+  // 구/군, 동 코드 초기화
+  houseStore.gugunCode = 0;
+  houseStore.dongCode = 0;
+
+  // 리스트 초기화
+  addressStore.gugunList = [];
+  addressStore.dongList = [];
+
+  // 새 시/도에 맞는 구/군 목록 불러오기
+  addressStore.getGugunList({ sidoCode: houseStore.sidoCode });
+}
+
+function onChangeGugun() {
+  // 동 초기화
+  houseStore.dongCode = 0;
+  addressStore.dongList = [];
+
+  addressStore.getDongList({ gugunCode: houseStore.gugunCode });
+}
 </script>
 
 <template>
@@ -29,32 +49,36 @@ onMounted(async () => {
     <fieldset
       class="form-group d-flex align-items-center justify-content-center mb-3 mt-3"
     >
-      <select
-        class="form-select"
-        v-model="sido"
-        @change="addressStore.getGugunList"
-      >
+      <select class="form-select" v-model="sidoCode" @change="onChangeSido">
         <option value="0">시/도</option>
-        <option v-for="s in sidoList" :key="s.code" :value="s.code">
-          {{ s.name }}
+        <option
+          v-for="sido in sidoList"
+          :key="sido.sidoCode"
+          :value="sido.sidoCode"
+        >
+          {{ sido.sidoName }}
         </option>
       </select>
 
-      <select
-        class="form-select"
-        v-model="gugun"
-        @change="addressStore.getDongList"
-      >
+      <select class="form-select" v-model="gugunCode" @change="onChangeGugun">
         <option value="0">구/군</option>
-        <option v-for="g in gugunList" :key="g.code" :value="g.code">
-          {{ g.name }}
+        <option
+          v-for="gugun in gugunList"
+          :key="gugun.gugunCode"
+          :value="gugun.gugunCode"
+        >
+          {{ gugun.gugunName }}
         </option>
       </select>
 
-      <select class="form-select" v-model="dong">
+      <select class="form-select" v-model="dongCode">
         <option value="0">읍/면/동</option>
-        <option v-for="d in dongList" :key="d.code" :value="d.code">
-          {{ d.name }}
+        <option
+          v-for="dong in dongList"
+          :key="dong.dongCode"
+          :value="dong.dongCode"
+        >
+          {{ dong.dongName }}
         </option>
       </select>
 
@@ -64,7 +88,11 @@ onMounted(async () => {
         type="text"
         placeholder="아파트명"
       />
-      <button class="btn btn-primary" type="button">
+      <button
+        class="btn btn-primary"
+        type="button"
+        @click="houseStore.fetchHouseList"
+      >
         <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
       </button>
     </fieldset>
