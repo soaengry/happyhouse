@@ -1,24 +1,16 @@
-import api from ".";
+import { fetchData } from "./apiHelper";
 
 const houseService = {
   // 매물 리스트 조회
-  async getHouseList({
-    limit,
-    offset,
-    sidoCode,
-    gugunCode,
-    dongCode,
-    keyword,
-  }) {
-    const params = { limit, offset, sidoCode, gugunCode, dongCode, keyword };
-    const { data } = await api.get("/house", { params });
-    return data; // { count: number, houseList: [...], result: number }
+  getHouseList(params) {
+    // params: { limit: number, offset: number, sidoCode: number, gugunCode: number, dongCode: number, keyword: string}
+    return fetchData("/house", { params }); // { count: number, houseList: [...], result: number }
   },
 
   // 특정 매물 거래 내역 조회
-  async getDealList(aptCode) {
-    const { data } = await api.get(`/house/${aptCode}`);
-    return data; // { count: number, houseList: [...], result: number }
+  getDealList(aptCode) {
+    // aptCode: number
+    return fetchData(`/house/${aptCode}`); // { count: number, houseList: [...], result: number }
   },
 };
 

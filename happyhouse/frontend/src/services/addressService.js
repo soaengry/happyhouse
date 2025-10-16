@@ -1,17 +1,14 @@
-import api from ".";
+import { fetchData } from "./apiHelper";
 
 const addressService = {
-  async getSidoList() {
-    const { data } = await api.get("/sido");
-    return data;
+  getSidoList() {
+    return fetchData("/sido");
   },
-  async getGugunList(sidoCode) {
-    const { data } = await api.get(`/gugun/${sidoCode}`);
-    return data;
+  getGugunList(sidoCode) {
+    return fetchData(`/gugun/${sidoCode}`);
   },
-  async getDongList(gugunCode) {
-    const { data } = await api.get(`/dong/${gugunCode}`);
-    return data;
+  getDongList(gugunCode) {
+    return fetchData(`/dong/${gugunCode}`);
   },
 };
 

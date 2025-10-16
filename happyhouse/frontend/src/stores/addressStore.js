@@ -11,11 +11,18 @@ export const useAddressStore = defineStore("address", {
     async getSidoList() {
       this.sidoList = await addressService.getSidoList();
     },
-    async getGugunList({ sidoCode }) {
+    async getGugunList(sidoCode) {
       this.gugunList = await addressService.getGugunList(sidoCode);
     },
-    async getDongList({ gugunCode }) {
+    async getDongList(gugunCode) {
       this.dongList = await addressService.getDongList(gugunCode);
+    },
+    resetGugun() {
+      this.gugunList = [];
+      this.dongList = [];
+    },
+    resetDong() {
+      this.dongList = [];
     },
   },
 });
