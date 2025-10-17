@@ -1,8 +1,11 @@
 package com.soaeng.happyhouse.config;
 
 import com.soaeng.happyhouse.filter.LoginFilter;
+import com.soaeng.happyhouse.handler.RefreshTokenLogoutHandler;
+import com.soaeng.happyhouse.jwt.service.JwtService;
+import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,18 +22,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final AuthenticationSuccessHandler loginSuccessHandler;
+    private final AuthenticationSuccessHandler socialSuccessHandler;
+    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
 
-    public SecurityConfig(
-            AuthenticationConfiguration authenticationConfiguration,
-            @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler
-    ) {
-        this.authenticationConfiguration = authenticationConfiguration;
-        this.loginSuccessHandler = loginSuccessHandler;
-    }
 
     // 비밀번호 단방향 암호화
     @Bean
@@ -48,6 +48,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 // Form 로그인 방식 disable
                 .formLogin(AbstractHttpConfigurer::disable)
+                // oauth2
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(socialSuccessHandler))
                 // Custom Filter 추가
                 .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
                 // 경로별 인가 작업
@@ -62,6 +65,9 @@ public class SecurityConfig {
                             response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403 응답
                         })
                 )
+                // logout
+                .logout(logout -> logout
+                        .addLogoutHandler(new RefreshTokenLogoutHandler(jwtUtil, jwtService)))
                 // 세션 설정: STATELESS
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

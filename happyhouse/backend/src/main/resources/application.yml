@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: env
+    include: env, oauth
     active: local
 
   application:

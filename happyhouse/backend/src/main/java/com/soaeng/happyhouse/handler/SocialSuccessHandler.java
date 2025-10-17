@@ -1,8 +1,10 @@
 package com.soaeng.happyhouse.handler;
 
+
 import com.soaeng.happyhouse.jwt.service.JwtService;
 import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +16,13 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Qualifier("LoginSuccessHandler")
+@Qualifier("SocialSuccessHandler")
 @RequiredArgsConstructor
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class SocialSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
     private final JwtService jwtService;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -28,20 +31,21 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String username = authentication.getName();
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        // JWT(Access/Refresh) 발급
-        String accessToken = jwtUtil.createJWT(username, role, true);
-        String refreshToken = jwtUtil.createJWT(username, role, false);
+        // JWT(Refresh) 발급
+        String refreshToken = jwtUtil.createJWT(username, "ROLE_" + role, false);
 
         // 발급한 Refresh DB 테이블 저장 (Refresh whitelist)
         jwtService.addRefresh(username, refreshToken);
 
         // 응답
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(false);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(10); // 10초 (프론트에서 발급 후 바로 헤더 전환 로직 진행 예정)
 
-        String json = String.format("{\"accessToken\":\"%s\", \"refreshToken\":\"%s\"}", accessToken, refreshToken);
-        response.getWriter().write(json);
-        response.getWriter().flush();
+        response.addCookie(refreshCookie);
+        response.sendRedirect("http://localhost:3000/cookie");
     }
 
 }
