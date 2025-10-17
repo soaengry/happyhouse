@@ -4,39 +4,41 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-public class JWTUtil {
+@Component
+public class JwtUtil {
 
-    private static final SecretKey secretKey;
+    private final SecretKey secretKey;
     private static final Long accessTokenExpiresIn;
     private static final Long refreshTokenExpiresIn;
-    @Value("${spring.jwt.secret}")
-    private static String secretKeyString;
+
+    public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
+        secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    }
 
     static {
-        secretKey = new SecretKeySpec(secretKeyString.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
-
         accessTokenExpiresIn = 3600L * 1000; // 1시간
         refreshTokenExpiresIn = 604800L * 1000; // 7일
     }
 
     // JWT 클레임 username 파싱
-    public static String getUsername(String token) {
+    public String getUsername(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("sub", String.class);
     }
 
     // JWT 클레임 role 파싱
-    public static String getRole(String token) {
+    public String getRole(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
     // JWT 유효 여부 (위조, 시간, Access/Refresh 여부)
-    public static Boolean isValid(String token, Boolean isAccess) {
+    public Boolean isValid(String token, Boolean isAccess) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(secretKey)
@@ -48,9 +50,7 @@ public class JWTUtil {
             if (type == null) return false;
 
             if (isAccess && !type.equals("access")) return false;
-            if (!isAccess && !type.equals("refresh")) return false;
-
-            return true;
+            return isAccess || type.equals("refresh");
 
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -58,7 +58,7 @@ public class JWTUtil {
     }
 
     // JWT(Access/Refresh) 생성
-    public static String createJWT(String username, String role, Boolean isAccess) {
+    public String createJWT(String username, String role, Boolean isAccess) {
 
         long now = System.currentTimeMillis();
         long expiry = isAccess ? accessTokenExpiresIn : refreshTokenExpiresIn;

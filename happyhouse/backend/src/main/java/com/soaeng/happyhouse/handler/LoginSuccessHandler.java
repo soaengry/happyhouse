@@ -1,11 +1,10 @@
 package com.soaeng.happyhouse.handler;
 
 import com.soaeng.happyhouse.jwt.service.JwtService;
-import com.soaeng.happyhouse.util.JWTUtil;
+import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -14,11 +13,16 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@RequiredArgsConstructor
 @Qualifier("LoginSuccessHandler")
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final JwtUtil jwtUtil;
     private final JwtService jwtService;
+
+    public LoginSuccessHandler(JwtService jwtService, JwtUtil jwtUtil) {
+        this.jwtService = jwtService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -28,8 +32,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
         // JWT(Access/Refresh) 발급
-        String accessToken = JWTUtil.createJWT(username, role, true);
-        String refreshToken = JWTUtil.createJWT(username, role, false);
+        String accessToken = jwtUtil.createJWT(username, role, true);
+        String refreshToken = jwtUtil.createJWT(username, role, false);
 
         // 발급한 Refresh DB 테이블 저장 (Refresh whitelist)
         jwtService.addRefresh(username, refreshToken);
