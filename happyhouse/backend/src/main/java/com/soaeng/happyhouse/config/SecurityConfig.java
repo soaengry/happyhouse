@@ -1,5 +1,6 @@
 package com.soaeng.happyhouse.config;
 
+import com.soaeng.happyhouse.filter.JwtFilter;
 import com.soaeng.happyhouse.filter.LoginFilter;
 import com.soaeng.happyhouse.handler.RefreshTokenLogoutHandler;
 import com.soaeng.happyhouse.jwt.service.JwtService;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -53,6 +55,7 @@ public class SecurityConfig {
                         .successHandler(socialSuccessHandler))
                 // Custom Filter 추가
                 .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
                 // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
