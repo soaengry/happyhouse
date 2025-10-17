@@ -4,11 +4,16 @@ import com.soaeng.happyhouse.filter.JwtFilter;
 import com.soaeng.happyhouse.filter.LoginFilter;
 import com.soaeng.happyhouse.handler.RefreshTokenLogoutHandler;
 import com.soaeng.happyhouse.jwt.service.JwtService;
+import com.soaeng.happyhouse.user.entity.RoleType;
 import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +26,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +42,8 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler socialSuccessHandler;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
-
+    @Value("{server.host.front}")
+    private String frontHost;
 
     // 비밀번호 단방향 암호화
     @Bean
@@ -58,7 +69,12 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
                 // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
+                        .requestMatchers("/jwt/exchange", "/jwt/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/exist", "/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user").hasRole(RoleType.USER.name())
+                        .requestMatchers(HttpMethod.PUT, "/user").hasRole(RoleType.USER.name())
+                        .requestMatchers(HttpMethod.DELETE, "/user").hasRole(RoleType.USER.name())
+                        .anyRequest().authenticated())
                 // 예외 처리
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -84,4 +100,27 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(frontHost));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
+    // 권한 계층
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withRolePrefix("ROLE_")
+                .role(RoleType.ADMIN.name()).implies(RoleType.USER.name())
+                .build();
+    }
 }
