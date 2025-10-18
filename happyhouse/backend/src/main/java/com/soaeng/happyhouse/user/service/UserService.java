@@ -1,7 +1,7 @@
 package com.soaeng.happyhouse.user.service;
 
 import com.soaeng.happyhouse.user.dto.request.UserRequestDto;
-import com.soaeng.happyhouse.user.entity.response.UserResponseDto;
+import com.soaeng.happyhouse.user.dto.response.UserResponseDto;
 
 public interface UserService {
 

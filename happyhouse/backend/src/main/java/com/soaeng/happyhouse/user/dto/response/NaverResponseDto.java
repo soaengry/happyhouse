@@ -1,4 +1,4 @@
-package com.soaeng.happyhouse.user.entity.response;
+package com.soaeng.happyhouse.user.dto.response;
 
 import java.util.Map;
 

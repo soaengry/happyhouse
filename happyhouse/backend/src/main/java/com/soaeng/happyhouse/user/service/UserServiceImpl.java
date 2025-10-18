@@ -3,10 +3,10 @@ package com.soaeng.happyhouse.user.service;
 import com.soaeng.happyhouse.jwt.service.JwtService;
 import com.soaeng.happyhouse.user.dto.CustomOAuth2User;
 import com.soaeng.happyhouse.user.dto.request.UserRequestDto;
+import com.soaeng.happyhouse.user.dto.response.*;
 import com.soaeng.happyhouse.user.entity.ProviderType;
 import com.soaeng.happyhouse.user.entity.RoleType;
 import com.soaeng.happyhouse.user.entity.UserEntity;
-import com.soaeng.happyhouse.user.entity.response.*;
 import com.soaeng.happyhouse.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -119,17 +119,16 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
 
             userRepository.save(user);
         } else {
-            user = entity.get();
             // 신규 유저 추가
             UserEntity newUserEntity = UserEntity.builder()
-                    .username(user.getUsername())
+                    .username(oAuth2ResponseDto.getUsername())
                     .password("")
                     .isLock(false)
                     .isSocial(true)
                     .socialProviderType(ProviderType.valueOf(registrationId))
                     .roleType(role)
-                    .nickname(user.getNickname())
-                    .email(user.getEmail())
+                    .nickname(oAuth2ResponseDto.getNickname())
+                    .email(oAuth2ResponseDto.getEmail())
                     .build();
 
             user = userRepository.save(newUserEntity);

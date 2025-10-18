@@ -2,7 +2,7 @@ package com.soaeng.happyhouse.user.controller;
 
 
 import com.soaeng.happyhouse.user.dto.request.UserRequestDto;
-import com.soaeng.happyhouse.user.entity.response.UserResponseDto;
+import com.soaeng.happyhouse.user.dto.response.UserResponseDto;
 import com.soaeng.happyhouse.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
