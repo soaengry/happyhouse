@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -26,20 +28,16 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String authorization = request.getHeader("Authorization");
-        if (authorization == null) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            log.debug("[JwtFilter] authorization == null");
             filterChain.doFilter(request, response);
             return;
-        }
-
-        if (!authorization.startsWith("Bearer ")) {
-            throw new ServletException("Invalid JWT token");
         }
 
         // 토큰 파싱
         String accessToken = authorization.split(" ")[1];
 
         if (jwtUtil.isValid(accessToken, true)) {
-
             String username = jwtUtil.getUsername(accessToken);
             String role = jwtUtil.getRole(accessToken);
 
@@ -47,14 +45,31 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
-
-            filterChain.doFilter(request, response);
-
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"error\":\"토큰 만료 또는 유효하지 않은 토큰\"}");
         }
 
+        filterChain.doFilter(request, response);
+    }
+
+    // 공개 API or OPTIONS 요청은 JWT 필터 스킵
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI().substring(4);
+        String method = request.getMethod();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        // 인증 없이 접근 가능한 경로 목록
+        return path.equals("/user")
+                || path.equals("/user/exist")
+                || path.equals("/jwt/exchange")
+                || path.equals("/jwt/refresh")
+                || path.startsWith("/sido")
+                || path.startsWith("/house");
     }
 }

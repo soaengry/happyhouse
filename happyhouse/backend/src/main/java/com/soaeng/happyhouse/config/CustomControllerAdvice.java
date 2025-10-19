@@ -22,4 +22,11 @@ public class CustomControllerAdvice {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("잘못된 요청입니다.");
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("서버 에러 발생");
+    }
 }

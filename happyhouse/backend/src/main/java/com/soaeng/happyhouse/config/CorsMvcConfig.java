@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsMvcConfig implements WebMvcConfigurer {
-    @Value("{server.host.front}")
+    @Value("${server.host.front}")
     private String frontHost;
 
     @Override
@@ -21,4 +21,3 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders("Set-Cookie", "Authorization");
     }
 }
-

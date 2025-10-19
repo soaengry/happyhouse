@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,8 +43,10 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler socialSuccessHandler;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
-    @Value("{server.host.front}")
+    @Value("${server.host.front}")
     private String frontHost;
+    @Value("${spring.security.debug:false}")
+    boolean securityDebug;
 
     // 비밀번호 단방향 암호화
     @Bean
@@ -55,6 +58,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
+                .cors(corsCustomizer -> corsConfigurationSource())
                 // CSRF 보안 필터 disable
                 .csrf(AbstractHttpConfigurer::disable)
                 // HTTP Basic 인증 방식 disable
@@ -64,17 +68,21 @@ public class SecurityConfig {
                 // oauth2
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(socialSuccessHandler))
-                // Custom Filter 추가
-                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
                 // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/jwt/exchange", "/jwt/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/exist", "/user").permitAll()
+                        // 공개 API
+                        .requestMatchers(HttpMethod.POST, "/user", "/user/exist").permitAll()
+                        .requestMatchers("/jwt/exchange", "/jwt/refresh", "/error").permitAll()
+                        .requestMatchers("/sido", "/house").permitAll()
+                        // 인증 필요 API
                         .requestMatchers(HttpMethod.GET, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.DELETE, "/user").hasRole(RoleType.USER.name())
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
+                // Custom Filter 추가
+                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
+                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
                 // 예외 처리
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -122,5 +130,10 @@ public class SecurityConfig {
         return RoleHierarchyImpl.withRolePrefix("ROLE_")
                 .role(RoleType.ADMIN.name()).implies(RoleType.USER.name())
                 .build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.debug(securityDebug);
     }
 }
