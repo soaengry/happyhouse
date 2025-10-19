@@ -125,7 +125,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
                     .password("")
                     .isLock(false)
                     .isSocial(true)
-                    .socialProviderType(ProviderType.valueOf(registrationId))
+                    .providerType(ProviderType.valueOf(registrationId))
                     .roleType(role)
                     .nickname(oAuth2ResponseDto.getNickname())
                     .email(oAuth2ResponseDto.getEmail())

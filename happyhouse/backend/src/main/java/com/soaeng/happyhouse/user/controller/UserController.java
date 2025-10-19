@@ -34,8 +34,6 @@ public class UserController {
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Long>> join(
             @Validated(UserRequestDto.addGroup.class) @RequestBody UserRequestDto dto) {
-        log.debug("[Controller] post /user");
-        log.debug(dto.toString());
         Long id = userService.addUser(dto);
         Map<String, Long> responseBody = Collections.singletonMap("userEntityId", id);
         return ResponseEntity.status(201).body(responseBody);

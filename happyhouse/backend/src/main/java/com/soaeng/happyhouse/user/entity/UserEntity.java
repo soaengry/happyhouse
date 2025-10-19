@@ -39,7 +39,7 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider_type")
-    private ProviderType socialProviderType;
+    private ProviderType providerType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role_type", nullable = false)
