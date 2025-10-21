@@ -13,6 +13,10 @@ const userService = {
     const { data } = await api.post("/login", { username, password });
     return data; // { accessToken, refreshToken }
   },
+  async fetchUserInfo() {
+    const { data } = await api.get("/user");
+    return data;
+  },
 };
 
 export default userService;

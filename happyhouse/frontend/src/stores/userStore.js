@@ -7,6 +7,7 @@ export const useUserStore = defineStore("user", {
     isLoading: false,
     error: "",
   }),
+
   actions: {
     async register({ username, password, nickname, email }) {
       this.isLoading = true;
