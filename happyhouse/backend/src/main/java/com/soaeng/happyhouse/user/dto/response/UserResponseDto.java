@@ -1,4 +1,4 @@
 package com.soaeng.happyhouse.user.dto.response;
 
-public record UserResponseDto(String username, Boolean social, String nickname, String email) {
+public record UserResponseDto(String username, Boolean isSocial, String nickname, String email) {
 }

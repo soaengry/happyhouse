@@ -40,7 +40,7 @@ public class UserController {
     }
 
     // 유저 정보
-    @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "")
     public UserResponseDto userMe() {
         return userService.readUser();
     }

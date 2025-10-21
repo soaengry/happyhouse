@@ -29,7 +29,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.debug("[JwtFilter] authorization == null");
             filterChain.doFilter(request, response);
             return;
         }
@@ -40,9 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (jwtUtil.isValid(accessToken, true)) {
             String username = jwtUtil.getUsername(accessToken);
             String role = jwtUtil.getRole(accessToken);
-
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-
             Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
@@ -57,17 +54,25 @@ public class JwtFilter extends OncePerRequestFilter {
     // 공개 API or OPTIONS 요청은 JWT 필터 스킵
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI().substring(4);
+        String path = request.getRequestURI().replaceFirst(request.getContextPath(), "");
         String method = request.getMethod();
 
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
 
+        // POST /user → JWT 체크 필요 없음
+        if (path.equals("/user") && "POST".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        // POST /user/exist → JWT 체크 필요 없음
+        if (path.equals("/user/exist") && "POST".equalsIgnoreCase(method)) {
+            return true;
+        }
+
         // 인증 없이 접근 가능한 경로 목록
-        return path.equals("/user")
-                || path.equals("/user/exist")
-                || path.equals("/jwt/exchange")
+        return path.equals("/jwt/exchange")
                 || path.equals("/jwt/refresh")
                 || path.startsWith("/sido")
                 || path.startsWith("/house");

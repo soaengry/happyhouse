@@ -44,7 +44,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
     @Value("${server.host.front}")
-    private String frontHost;
+    private String FRONT_HOST;
     @Value("${spring.security.debug:false}")
     boolean securityDebug;
 
@@ -111,7 +111,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontHost));
+        configuration.setAllowedOrigins(List.of(FRONT_HOST));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
