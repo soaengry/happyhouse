@@ -43,11 +43,13 @@ export const useUserStore = defineStore("user", {
         });
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        this.user = { username };
+        // 사용자 정보 가져오기
+        const userInfo = await userService.fetchUserInfo();
+        this.user = userInfo; // 예: { id, username, nickname, email }
         return true;
       } catch (err) {
         console.error(err);
-        this.error = "로그인 실패: 아이디 또는 비밀번호를 확인하세요.";
+        this.error = "아이디 또는 비밀번호를 확인하세요.";
         return false;
       } finally {
         this.isLoading = false;

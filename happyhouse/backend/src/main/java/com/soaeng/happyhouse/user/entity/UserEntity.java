@@ -60,7 +60,9 @@ public class UserEntity {
     private LocalDateTime updatedDate;
 
     public void updateUser(UserRequestDto dto) {
-        this.email = dto.getEmail();
         this.nickname = dto.getNickname();
+        if (dto.getPassword() != null) {
+            this.password = dto.getPassword();
+        }
     }
 }

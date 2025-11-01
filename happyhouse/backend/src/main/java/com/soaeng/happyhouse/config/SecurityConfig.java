@@ -18,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,8 +44,8 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     @Value("${server.host.front}")
     private String FRONT_HOST;
-    @Value("${spring.security.debug:false}")
-    boolean securityDebug;
+//    @Value("${spring.security.debug:false}")
+//    boolean securityDebug;
 
     // 비밀번호 단방향 암호화
     @Bean
@@ -132,8 +131,8 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.debug(securityDebug);
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.debug(securityDebug);
+//    }
 }

@@ -17,6 +17,10 @@ const userService = {
     const { data } = await api.get("/user");
     return data;
   },
+  async updateUser(userData) {
+    const { data } = await api.put("/user", userData);
+    return data;
+  },
 };
 
 export default userService;
