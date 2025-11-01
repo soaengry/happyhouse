@@ -9,13 +9,23 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 /* import icons and add them to the Library */
 import {
+  faHouse,
   faMagnifyingGlass,
   faSpinner,
+  faBookmark,
+  faNewspaper,
+  faGlobe,
+  faBars,
 } from "@fortawesome/free-solid-svg-icons";
 import { createPinia } from "pinia";
 
 library.add(faMagnifyingGlass);
 library.add(faSpinner);
+library.add(faHouse);
+library.add(faBookmark);
+library.add(faNewspaper);
+library.add(faGlobe);
+library.add(faBars);
 
 const pinia = createPinia();
 const app = createApp(App);

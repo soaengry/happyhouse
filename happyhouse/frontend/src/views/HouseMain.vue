@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="title-box d-flex justify-content-between">
-      <h3>매물 검색</h3>
+    <div class="content-title">
+      <h2>매물 검색</h2>
     </div>
+    <hr />
 
     <!-- 검색창 -->
     <fieldset
@@ -183,6 +184,7 @@ function onSearch() {
   paginationStore.currentPageIndex = 1;
 }
 </script>
+
 <style scoped>
 .skeleton-row {
   height: 1.6rem;

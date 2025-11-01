@@ -1,28 +1,19 @@
 <template>
   <div id="app">
-    <div id="wrapper">
-      <div>
-        <TheHeader />
-      </div>
-      <main id="content-wrapper">
-        <RouterView />
-      </main>
-    </div>
+    <RouterView />
   </div>
 </template>
 
-<script>
-import TheHeader from "./components/TheHeader.vue";
-
-export default {
-  name: "App",
-  components: { TheHeader },
-};
-</script>
-
 <style>
+@import "./assets/css/app.css";
+
 #app {
+  height: 100vh;
+  overflow-x: hidden;
   word-break: keep-all;
   font-family: "Noto Sans KR", sans-serif;
+  min-width: 320px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 </style>

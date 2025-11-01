@@ -7,7 +7,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import { useUserStore } from "@/stores/userStore";
 const router = useRouter();
 const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
 
@@ -28,6 +28,19 @@ async function cookieToBody() {
     const data = await res.json();
     localStorage.setItem("accessToken", data.accessToken);
     localStorage.setItem("refreshToken", data.refreshToken);
+
+    // 사용자 정보 요청
+    const userInfo = await fetch(`${BASE_URL}/api/user`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
+    });
+    if (!userInfo.ok) throw new Error("유저 정보 요청 실패");
+
+    const userData = await userInfo.json();
+    const userStore = useUserStore();
+    userStore.user = userData;
 
     router.push("/");
   } catch (err) {

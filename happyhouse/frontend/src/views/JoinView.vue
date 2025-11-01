@@ -1,68 +1,82 @@
 <template>
-  <div class="container mt-5" style="max-width: 500px">
-    <h1>회원 가입</h1>
+  <div id="wrap">
+    <div class="container">
+      <div class="inner">
+        <h1>회원 가입</h1>
 
-    <form @submit.prevent="onSubmit">
-      <!-- 아이디 -->
-      <label for="username">아이디</label>
-      <input
-        id="username"
-        type="text"
-        v-model="username"
-        placeholder="아이디 (4자 이상)"
-        required
-        minlength="4"
-      />
-      <p v-if="username.length >= 4 && isUsernameValid === false">
-        이미 사용 중인 아이디입니다.
-      </p>
-      <p v-if="username.length >= 4 && isUsernameValid === true">
-        사용 가능한 아이디입니다.
-      </p>
+        <form @submit.prevent="onSubmit">
+          <!-- 아이디 -->
+          <div class="form-group">
+            <input
+              id="username"
+              type="text"
+              v-model="username"
+              placeholder="아이디 (4자 이상)"
+              required
+              minlength="4"
+            />
+            <div class="info-text">
+              <p v-if="username.length >= 4 && isUsernameValid === false">
+                이미 사용 중인 아이디입니다.
+              </p>
+              <p v-if="username.length >= 4 && isUsernameValid === true">
+                사용 가능한 아이디입니다.
+              </p>
+            </div>
+          </div>
+          <!-- 비밀번호 -->
+          <div class="form-group">
+            <input
+              id="password"
+              type="password"
+              v-model="password"
+              placeholder="비밀번호 (8자 이상)"
+              required
+              minlength="8"
+            />
+            <div class="info-text"></div>
+          </div>
+          <!-- 닉네임 -->
+          <div class="form-group">
+            <input
+              id="nickname"
+              type="text"
+              v-model="nickname"
+              placeholder="닉네임"
+              required
+            />
+            <div class="info-text"></div>
+          </div>
+          <div class="form-group">
+            <!-- 이메일 -->
+            <input
+              id="email"
+              type="email"
+              v-model="email"
+              placeholder="이메일 주소"
+              required
+            />
+            <div class="info-text">
+              <p v-if="userStore.error" class="danger">{{ userStore.error }}</p>
+            </div>
+          </div>
 
-      <!-- 비밀번호 -->
-      <label for="password">비밀번호</label>
-      <input
-        id="password"
-        type="password"
-        v-model="password"
-        placeholder="비밀번호 (4자 이상)"
-        required
-        minlength="4"
-      />
-
-      <!-- 닉네임 -->
-      <label for="nickname">닉네임</label>
-      <input
-        id="nickname"
-        type="text"
-        v-model="nickname"
-        placeholder="닉네임"
-        required
-      />
-
-      <!-- 이메일 -->
-      <label for="email">이메일</label>
-      <input
-        id="email"
-        type="email"
-        v-model="email"
-        placeholder="이메일 주소"
-        required
-      />
-
-      <p v-if="userStore.error" class="text-danger">{{ userStore.error }}</p>
-
-      <button
-        type="submit"
-        :disabled="isUsernameValid !== true || userStore.isLoading"
-      >
-        <span v-if="!userStore.isLoading">회원가입</span>
-        <span v-else>
-          <font-awesome-icon icon="fa-solid fa-spinner" spin /> 가입 중...
-        </span>
-      </button>
-    </form>
+          <button
+            class="join-btn"
+            type="submit"
+            :disabled="isUsernameValid !== true || userStore.isLoading"
+          >
+            <span v-if="!userStore.isLoading">회원가입</span>
+            <span v-else>
+              <font-awesome-icon icon="fa-solid fa-spinner" spin /> 가입 중...
+            </span>
+          </button>
+        </form>
+        <router-link class="login-text" to="/login"
+          >로그인 화면으로 돌아가기</router-link
+        >
+      </div>
+    </div>
   </div>
 </template>
 
@@ -104,3 +118,64 @@ async function onSubmit() {
   }
 }
 </script>
+
+<style scoped>
+.container {
+  background-color: aliceblue;
+  min-width: 320px;
+  max-width: 500px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+}
+
+.inner {
+  width: 270px;
+}
+
+.inner h1 {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.info-text {
+  height: 1.1rem;
+}
+
+.info-text p {
+  font-size: 0.8rem;
+  padding-left: 0.3rem;
+  line-height: 1rem;
+}
+
+.join-btn {
+  width: 100%;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 0.3rem;
+  background-color: var(--primary);
+  color: var(--light);
+}
+
+.join-btn:disabled {
+  background-color: var(--light);
+  color: var(--gray);
+}
+
+.login-text {
+  display: block;
+  text-align: center;
+  font-size: 0.9rem;
+}
+</style>
