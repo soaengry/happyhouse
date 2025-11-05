@@ -164,8 +164,9 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         // 조회
         UserEntity entity = userRepository.findByUsernameAndIsLockAndIsSocial(dto.getUsername(), false, false)
                 .orElseThrow(() -> new UsernameNotFoundException(dto.getUsername()));
-
-        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (dto.getPassword() != null || dto.getPassword().length() > 0) {
+            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
         // 회원 정보 수정
         entity.updateUser(dto);
 
