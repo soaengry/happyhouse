@@ -55,23 +55,26 @@
   </header>
 </template>
 
-<script>
+<script setup>
 import { useUserStore } from "@/stores/userStore";
-import { mapState } from "pinia";
+import { computed, onMounted } from "vue";
 
-export default {
-  name: "TheHeader",
-  computed: {
-    ...mapState(useUserStore, ["user"]),
-    nickname() {
-      return this.user?.nickname || "로그인";
-    },
-  },
-};
+const userStore = useUserStore();
+
+const nickname = computed(() => userStore.user?.nickname || "로그인");
+
+onMounted(() => {
+  if (!userStore.user && localStorage.getItem("accessToken")) {
+    userStore.fetchUserInfo?.();
+  }
+});
 </script>
 
 <style scoped>
 .header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
   background-color: #4e73df;
   height: 100vh;
   width: 260px;

@@ -55,5 +55,20 @@ export const useUserStore = defineStore("user", {
         this.isLoading = false;
       }
     },
+
+    async fetchUserInfo() {
+      try {
+        const data = await userService.fetchUserInfo();
+        this.user = data;
+      } catch (err) {
+        console.error("사용자 정보 불러오기 실패", err);
+      }
+    },
+
+    logout() {
+      this.user = null;
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    },
   },
 });

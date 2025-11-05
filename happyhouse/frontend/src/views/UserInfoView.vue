@@ -40,6 +40,9 @@
           </div>
           <p class="info-text" v-else>소셜 로그인 계정입니다.</p>
           <div class="btn-box">
+            <button class="logout-btn" type="button" @click="logout">
+              로그아웃
+            </button>
             <button class="form-btn" type="submit">프로필 수정</button>
           </div>
         </form>
@@ -51,6 +54,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import userService from "@/services/userService";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
 
 const user = ref({});
 const isLoading = ref(true);
@@ -61,6 +66,8 @@ const successMessage = ref("");
 const passwordMismatch = computed(() => {
   return newPassword.value && comfirmPassword.value !== newPassword.value;
 });
+const store = useUserStore();
+const router = useRouter();
 
 onMounted(async () => {
   try {
@@ -101,6 +108,11 @@ async function handleSubmit(e) {
     console.error(err);
   }
 }
+
+function logout() {
+  store.logout();
+  router.push("/login");
+}
 </script>
 
 <style scoped>
@@ -134,15 +146,24 @@ async function handleSubmit(e) {
 
 .btn-box {
   display: flex;
-  justify-content: center;
+  justify-content: end;
 }
 
 .form-btn {
   background-color: var(--primary);
   color: var(--light);
-  border: none;
   height: 40px;
   width: 120px;
+  border: none;
+  border-radius: 0.2rem;
+  margin-left: 1rem;
+}
+
+.logout-btn {
+  color: var(--primary);
+  height: 40px;
+  width: 120px;
+  border: none;
   border-radius: 0.2rem;
 }
 </style>

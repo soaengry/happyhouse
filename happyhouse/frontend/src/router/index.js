@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainLayout from "@/layouts/MainLayout.vue";
+import { useUserStore } from "@/stores/userStore";
 
 const routes = [
   {
@@ -38,6 +39,17 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+  const store = useUserStore();
+  const token = localStorage.getItem("accessToken");
+
+  if (token && !store.user) {
+    await store.fetchUserInfo?.();
+  }
+
+  next();
 });
 
 export default router;

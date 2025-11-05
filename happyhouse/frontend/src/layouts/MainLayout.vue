@@ -19,5 +19,6 @@ export default {
 <style scoped>
 #content-wrapper {
   padding: 1rem;
+  margin-left: 260px;
 }
 </style>
