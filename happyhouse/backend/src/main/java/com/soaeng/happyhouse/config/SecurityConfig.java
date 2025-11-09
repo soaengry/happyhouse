@@ -72,7 +72,7 @@ public class SecurityConfig {
                         // 공개 API
                         .requestMatchers(HttpMethod.POST, "/user", "/user/exist").permitAll()
                         .requestMatchers("/jwt/exchange", "/jwt/refresh", "/error").permitAll()
-                        .requestMatchers("/sido", "/house").permitAll()
+                        .requestMatchers("/sido", "/gugun", "/dong", "/house/**").permitAll()
                         // 인증 필요 API
                         .requestMatchers(HttpMethod.GET, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/user").hasRole(RoleType.USER.name())

@@ -6,14 +6,16 @@ export const useHouseStore = defineStore("house", {
   state: () => ({
     count: 0,
     houseList: [],
+    dealList: [],
     sidoCode: 0,
     gugunCode: 0,
     dongCode: 0,
     keyword: "",
+    aptCode: 0,
     isLoading: false, // ✅ 로딩 상태 추가
   }),
   actions: {
-    async fetchHouseList() {
+    async getHouseList() {
       const paginationStore = usePaginationStore();
       this.isLoading = true; // ✅ 시작 시 true
       try {
@@ -33,6 +35,17 @@ export const useHouseStore = defineStore("house", {
         paginationStore.setTotalCount(count);
       } finally {
         this.isLoading = false; // ✅ 완료 후 false
+      }
+    },
+    async getDealList(aptCode) {
+      this.isLoading = true;
+      try {
+        const { count, houseList } = await houseService.getDealList(aptCode);
+        console.log(houseList);
+        this.dealList = houseList;
+        this.count = count;
+      } finally {
+        this.isLoading = false;
       }
     },
   },

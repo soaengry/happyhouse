@@ -71,7 +71,6 @@
         class="table table-hover text-center mb-3"
       >
         <colgroup>
-          <col width="8.8%" />
           <col width="28%" />
           <col width="27%" />
           <col width="10%" />
@@ -80,7 +79,6 @@
         </colgroup>
         <thead>
           <tr>
-            <th>번호</th>
             <th>아파트명</th>
             <th>주소</th>
             <th>건축연도</th>
@@ -98,10 +96,10 @@
         <tbody v-else>
           <tr
             v-for="house in houseList"
-            :key="house.no"
+            :key="house.aptCode"
             style="cursor: pointer"
+            @click="openModal(house)"
           >
-            <td>{{ house.no }}</td>
             <td class="text-start">{{ house.aptName }}</td>
             <td>{{ house.address }}</td>
             <td>{{ house.buildYear }}</td>
@@ -128,6 +126,11 @@
     <!-- Pagination -->
     <ThePagination @page-changed="onPageChanged" />
   </div>
+  <HouseDetailModal
+    v-if="selectedHouse"
+    :house="selectedHouse"
+    @close="closeModal"
+  />
 </template>
 
 <script setup>
@@ -138,6 +141,10 @@ import { useAddressStore } from "@/stores/addressStore";
 import ThePagination from "@/components/ThePagination.vue";
 import { makeDateStr } from "@/utils/date";
 import { usePaginationStore } from "@/stores/paginationStore";
+import HouseDetailModal from "@/components/HouseDetailModal.vue";
+import { ref } from "vue";
+
+const selectedHouse = ref(null);
 
 const houseStore = useHouseStore();
 const addressStore = useAddressStore();
@@ -149,7 +156,7 @@ const { sidoList, gugunList, dongList } = storeToRefs(addressStore);
 
 onMounted(async () => {
   await addressStore.getSidoList();
-  await houseStore.fetchHouseList();
+  await houseStore.getHouseList();
 });
 
 // 시/도 선택필드 변경 시
@@ -176,12 +183,20 @@ function onChangeGugun() {
 
 // 페이지 변경 시
 function onPageChanged() {
-  houseStore.fetchHouseList();
+  houseStore.getHouseList();
 }
 
 function onSearch() {
-  houseStore.fetchHouseList();
+  houseStore.getHouseList();
   paginationStore.currentPageIndex = 1;
+}
+
+function openModal(house) {
+  selectedHouse.value = house;
+}
+
+function closeModal() {
+  selectedHouse.value = null;
 }
 </script>
 
