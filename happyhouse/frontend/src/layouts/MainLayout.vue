@@ -21,4 +21,10 @@ export default {
   padding: 1rem;
   margin-left: 260px;
 }
+
+@media (max-width: 992px) {
+  #content-wrapper {
+    margin-left: 60px;
+  }
+}
 </style>

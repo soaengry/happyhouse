@@ -103,4 +103,17 @@ onMounted(() => {
 .menu-name {
   padding-left: 0.5rem;
 }
+
+@media (max-width: 992px) {
+  .header-container {
+    width: 60px;
+    align-items: center;
+  }
+  .brand-name {
+    display: none;
+  }
+  .menu-name {
+    display: none;
+  }
+}
 </style>
