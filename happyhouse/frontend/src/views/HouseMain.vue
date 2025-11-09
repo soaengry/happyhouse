@@ -4,128 +4,135 @@
       <h2>매물 검색</h2>
     </div>
     <hr />
-
-    <!-- 검색창 -->
-    <fieldset
-      class="form-group d-flex align-items-center justify-content-center mb-3 mt-3"
-    >
-      <select class="form-select" v-model="sidoCode" @change="onChangeSido">
-        <option value="0">시/도</option>
-        <option
-          v-for="sido in sidoList"
-          :key="sido.sidoCode"
-          :value="sido.sidoCode"
-        >
-          {{ sido.sidoName }}
-        </option>
-      </select>
-
-      <select class="form-select" v-model="gugunCode" @change="onChangeGugun">
-        <option value="0">구/군</option>
-        <option
-          v-for="gugun in gugunList"
-          :key="gugun.gugunCode"
-          :value="gugun.gugunCode"
-        >
-          {{ gugun.gugunName }}
-        </option>
-      </select>
-
-      <select class="form-select" v-model="dongCode">
-        <option value="0">읍/면/동</option>
-        <option
-          v-for="dong in dongList"
-          :key="dong.dongCode"
-          :value="dong.dongCode"
-        >
-          {{ dong.dongName }}
-        </option>
-      </select>
-
-      <input
-        v-model="keyword"
-        class="form-control"
-        type="text"
-        placeholder="아파트명"
-        @keydown.enter="onSearch"
-      />
-      <!-- 검색 버튼 -->
-      <button class="btn btn-primary" type="button" @click="onSearch">
-        <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
-      </button>
-    </fieldset>
-    <!-- end of form-group -->
-
-    <!-- 검색 결과 -->
-    <div class="list-info d-flex">
-      <p>
-        총&nbsp;<span class="text-primary">{{ count }}</span
-        >&nbsp;건
-      </p>
-    </div>
-
-    <div class="table-responsive">
-      <!-- 데이터 있을 때 -->
-      <table
-        v-if="houseList.length > 0"
-        class="table table-hover text-center mb-3"
+    <section class="content-body">
+      <!-- 검색창 -->
+      <fieldset
+        class="form-group d-flex align-items-center justify-content-center mb-3 mt-3"
       >
-        <colgroup>
-          <col width="28%" />
-          <col width="27%" />
-          <col width="10%" />
-          <col width="14.2%" />
-          <col width="12%" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>아파트명</th>
-            <th>주소</th>
-            <th>건축연도</th>
-            <th>최근거래금액</th>
-            <th>최근거래일</th>
-          </tr>
-        </thead>
-        <tbody v-if="isLoading">
-          <tr v-for="n in 10" :key="n">
-            <td colspan="6">
-              <div class="skeleton-row">&nbsp;</div>
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-else>
-          <tr
-            v-for="house in houseList"
-            :key="house.aptCode"
-            style="cursor: pointer"
-            @click="openModal(house)"
+        <select class="form-select" v-model="sidoCode" @change="onChangeSido">
+          <option value="0">시/도</option>
+          <option
+            v-for="sido in sidoList"
+            :key="sido.sidoCode"
+            :value="sido.sidoCode"
           >
-            <td class="text-start">{{ house.aptName }}</td>
-            <td>{{ house.address }}</td>
-            <td>{{ house.buildYear }}</td>
-            <td>{{ house.dealAmount }}만 원</td>
-            <td>
-              {{
-                makeDateStr(house.dealYear, house.dealMonth, house.dealDay, "-")
-              }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            {{ sido.sidoName }}
+          </option>
+        </select>
 
-      <!-- 데이터 없을 때 -->
-      <div
-        v-else
-        class="w-100 text-center"
-        style="border-bottom: 1px solid #dedede"
-      >
-        <p class="pt-5 pb-5 mb-0">조회된 데이터가 없습니다.</p>
+        <select class="form-select" v-model="gugunCode" @change="onChangeGugun">
+          <option value="0">구/군</option>
+          <option
+            v-for="gugun in gugunList"
+            :key="gugun.gugunCode"
+            :value="gugun.gugunCode"
+          >
+            {{ gugun.gugunName }}
+          </option>
+        </select>
+
+        <select class="form-select" v-model="dongCode">
+          <option value="0">읍/면/동</option>
+          <option
+            v-for="dong in dongList"
+            :key="dong.dongCode"
+            :value="dong.dongCode"
+          >
+            {{ dong.dongName }}
+          </option>
+        </select>
+
+        <input
+          v-model="keyword"
+          class="form-control"
+          type="text"
+          placeholder="아파트명"
+          @keydown.enter="onSearch"
+        />
+        <!-- 검색 버튼 -->
+        <button class="btn btn-primary" type="button" @click="onSearch">
+          <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+        </button>
+      </fieldset>
+      <!-- end of form-group -->
+
+      <!-- 검색 결과 -->
+      <div class="list-info d-flex">
+        <p>
+          총&nbsp;<span class="text-primary">{{ houseCount }}</span
+          >&nbsp;건
+        </p>
       </div>
-    </div>
-    <!-- end of .table-responsive-->
-    <!-- Pagination -->
-    <ThePagination @page-changed="onPageChanged" />
+
+      <div class="table-responsive">
+        <!-- 데이터 있을 때 -->
+        <table
+          v-if="houseList.length > 0"
+          class="table table-hover text-center mb-3"
+        >
+          <colgroup>
+            <col width="28%" />
+            <col width="27%" />
+            <col width="10%" />
+            <col width="14.2%" />
+            <col width="12%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>아파트명</th>
+              <th>주소</th>
+              <th>건축연도</th>
+              <th>최근거래금액</th>
+              <th>최근거래일</th>
+            </tr>
+          </thead>
+          <tbody v-if="isLoading">
+            <tr v-for="n in 10" :key="n">
+              <td colspan="6">
+                <div class="skeleton-row">&nbsp;</div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr
+              v-for="house in houseList"
+              :key="house.aptCode"
+              style="cursor: pointer"
+              @click="openModal(house)"
+            >
+              <td class="text-start">{{ house.aptName }}</td>
+              <td>{{ house.address }}</td>
+              <td>{{ house.buildYear }}</td>
+              <td>{{ house.dealAmount }}만 원</td>
+              <td>
+                {{
+                  makeDateStr(
+                    house.dealYear,
+                    house.dealMonth,
+                    house.dealDay,
+                    "-",
+                  )
+                }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 데이터 없을 때 -->
+        <div
+          v-else
+          class="w-100 text-center"
+          style="border-bottom: 1px solid #dedede"
+        >
+          <p class="pt-5 pb-5 mb-0">조회된 데이터가 없습니다.</p>
+        </div>
+      </div>
+      <!-- end of .table-responsive-->
+      <!-- Pagination -->
+      <ThePagination @page-changed="onPageChanged" />
+    </section>
   </div>
+
   <HouseDetailModal
     v-if="selectedHouse"
     :house="selectedHouse"
@@ -150,8 +157,15 @@ const houseStore = useHouseStore();
 const addressStore = useAddressStore();
 const paginationStore = usePaginationStore();
 
-const { count, houseList, sidoCode, gugunCode, dongCode, keyword, isLoading } =
-  storeToRefs(houseStore);
+const {
+  houseCount,
+  houseList,
+  sidoCode,
+  gugunCode,
+  dongCode,
+  keyword,
+  isLoading,
+} = storeToRefs(houseStore);
 const { sidoList, gugunList, dongList } = storeToRefs(addressStore);
 
 onMounted(async () => {

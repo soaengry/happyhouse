@@ -9,7 +9,7 @@
         <strong>거래일:</strong>
         {{ makeDateStr(house.dealYear, house.dealMonth, house.dealDay, "-") }}
       </p>
-      <p>{{ count }}</p>
+      <p>{{ dealCount }}</p>
       <div
         class="d-flex justify-content-between"
         v-for="deal in dealList"
@@ -39,7 +39,7 @@ const props = defineProps({
 
 const houseStore = useHouseStore();
 const emit = defineEmits(["close"]);
-const { count, dealList } = storeToRefs(houseStore);
+const { dealCount, dealList } = storeToRefs(houseStore);
 
 onMounted(async () => {
   await houseStore.getDealList(props.house.aptCode);
