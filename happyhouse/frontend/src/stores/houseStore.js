@@ -16,6 +16,39 @@ export const useHouseStore = defineStore("house", {
     isLoading: false,
   }),
   actions: {
+    resetHouseList() {
+      this.houseList = [];
+      this.houseCount = 0;
+      this.currentPage = 1;
+      this.hasMore = true;
+    },
+    async fetchNextPage() {
+      if (!this.hasMore || this.isLoading) return;
+
+      this.isLoading = true;
+      try {
+        const params = {
+          limit: 10,
+          offset: (this.currentPage - 1) * 10,
+          keyword: this.keyword,
+          sidoCode: this.sidoCode,
+          gugunCode: this.gugunCode,
+          dongCode: this.dongCode,
+        };
+        const { count, houseList } = await houseService.getHouseList(params);
+
+        if (houseList.length === 0) {
+          this.hasMore = false;
+        } else {
+          this.houseList.push(...houseList);
+          this.houseCount = count;
+          this.currentPage++;
+        }
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     async getHouseList() {
       const paginationStore = usePaginationStore();
       this.isLoading = true;

@@ -8,6 +8,7 @@
 @import "./assets/css/app.css";
 
 #app {
+  position: relative;
   height: 100vh;
   overflow-x: hidden;
   word-break: keep-all;

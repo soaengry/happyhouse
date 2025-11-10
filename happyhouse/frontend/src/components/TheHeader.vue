@@ -72,7 +72,7 @@ onMounted(() => {
 
 <style scoped>
 .header-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   background-color: #4e73df;

@@ -1,9 +1,8 @@
 <template>
   <div>
-    <div class="content-title">
+    <div class="content-header">
       <h2>매물 검색</h2>
     </div>
-    <hr />
     <section class="content-body">
       <!-- 검색창 -->
       <fieldset
@@ -64,72 +63,18 @@
         </p>
       </div>
 
-      <div class="table-responsive">
-        <!-- 데이터 있을 때 -->
-        <table
-          v-if="houseList.length > 0"
-          class="table table-hover text-center mb-3"
-        >
-          <colgroup>
-            <col width="28%" />
-            <col width="27%" />
-            <col width="10%" />
-            <col width="14.2%" />
-            <col width="12%" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>아파트명</th>
-              <th>주소</th>
-              <th>건축연도</th>
-              <th>최근거래금액</th>
-              <th>최근거래일</th>
-            </tr>
-          </thead>
-          <tbody v-if="isLoading">
-            <tr v-for="n in 10" :key="n">
-              <td colspan="6">
-                <div class="skeleton-row">&nbsp;</div>
-              </td>
-            </tr>
-          </tbody>
-          <tbody v-else>
-            <tr
-              v-for="house in houseList"
-              :key="house.aptCode"
-              style="cursor: pointer"
-              @click="openModal(house)"
-            >
-              <td class="text-start">{{ house.aptName }}</td>
-              <td>{{ house.address }}</td>
-              <td>{{ house.buildYear }}</td>
-              <td>{{ house.dealAmount }}만 원</td>
-              <td>
-                {{
-                  makeDateStr(
-                    house.dealYear,
-                    house.dealMonth,
-                    house.dealDay,
-                    "-",
-                  )
-                }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- 데이터 없을 때 -->
-        <div
-          v-else
-          class="w-100 text-center"
-          style="border-bottom: 1px solid #dedede"
-        >
-          <p class="pt-5 pb-5 mb-0">조회된 데이터가 없습니다.</p>
+      <div ref="scrollContainer" class="scroll-container">
+        <div class="card-grid">
+          <HouseCard
+            v-for="house in houseList"
+            :key="house.aptCode"
+            :house="house"
+            @click="openModal(house)"
+          />
         </div>
+
+        <div v-if="isLoading" class="text-center py-3">로딩 중...</div>
       </div>
-      <!-- end of .table-responsive-->
-      <!-- Pagination -->
-      <ThePagination @page-changed="onPageChanged" />
     </section>
   </div>
 
@@ -141,21 +86,20 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref, onBeforeUnmount } from "vue";
 import { storeToRefs } from "pinia";
 import { useHouseStore } from "@/stores/houseStore";
 import { useAddressStore } from "@/stores/addressStore";
-import ThePagination from "@/components/ThePagination.vue";
-import { makeDateStr } from "@/utils/date";
-import { usePaginationStore } from "@/stores/paginationStore";
+
+import HouseCard from "@/components/HouseCard.vue";
 import HouseDetailModal from "@/components/HouseDetailModal.vue";
-import { ref } from "vue";
 
 const selectedHouse = ref(null);
+const scrollContainer = ref(null);
+let observer;
 
 const houseStore = useHouseStore();
 const addressStore = useAddressStore();
-const paginationStore = usePaginationStore();
 
 const {
   houseCount,
@@ -170,7 +114,25 @@ const { sidoList, gugunList, dongList } = storeToRefs(addressStore);
 
 onMounted(async () => {
   await addressStore.getSidoList();
-  await houseStore.getHouseList();
+  houseStore.resetHouseList();
+  houseStore.fetchNextPage();
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting && !isLoading.value) {
+        houseStore.fetchNextPage();
+      }
+    },
+    { threshold: 1.0 },
+  );
+
+  const sentinel = document.createElement("div");
+  sentinel.id = "scroll-sentinel";
+  scrollContainer.value.appendChild(sentinel);
+  observer.observe(sentinel);
+});
+
+onBeforeUnmount(() => {
+  observer?.disconnect();
 });
 
 // 시/도 선택필드 변경 시
@@ -195,14 +157,9 @@ function onChangeGugun() {
   addressStore.getDongList(houseStore.gugunCode);
 }
 
-// 페이지 변경 시
-function onPageChanged() {
-  houseStore.getHouseList();
-}
-
 function onSearch() {
-  houseStore.getHouseList();
-  paginationStore.currentPageIndex = 1;
+  houseStore.resetHouseList();
+  houseStore.fetchNextPage();
 }
 
 function openModal(house) {
@@ -215,20 +172,31 @@ function closeModal() {
 </script>
 
 <style scoped>
-.skeleton-row {
-  height: 1.6rem;
-  background: linear-gradient(90deg, #eee, #ddd, #eee);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
-  border-radius: 4px;
+.content-header {
+  padding: 1rem 1rem 0 1rem;
 }
 
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
+.content-body {
+  margin: 1rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 1rem;
+}
+
+.scroll-container {
+  padding: 1rem 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ✅ 2열 */
+  gap: 1rem;
+}
+
+/* 반응형: 모바일에서는 1열 */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
