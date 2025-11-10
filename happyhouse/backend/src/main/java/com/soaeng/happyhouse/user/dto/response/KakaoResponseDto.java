@@ -30,7 +30,7 @@ public class KakaoResponseDto implements OAuth2ResponseDto {
     }
 
     @Override
-    public String getPicture() {
+    public String getProfileImage() {
         return (String) properties.get("thumbnail_image");
     }
 }

@@ -1,7 +1,6 @@
 package com.soaeng.happyhouse.config;
 
 import com.soaeng.happyhouse.filter.JwtFilter;
-import com.soaeng.happyhouse.filter.LoginFilter;
 import com.soaeng.happyhouse.handler.RefreshTokenLogoutHandler;
 import com.soaeng.happyhouse.jwt.service.JwtService;
 import com.soaeng.happyhouse.user.entity.RoleType;
@@ -20,12 +19,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,8 +33,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final AuthenticationSuccessHandler loginSuccessHandler;
     private final AuthenticationSuccessHandler socialSuccessHandler;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
@@ -46,12 +40,6 @@ public class SecurityConfig {
     private String FRONT_HOST;
 //    @Value("${spring.security.debug:false}")
 //    boolean securityDebug;
-
-    // 비밀번호 단방향 암호화
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -72,7 +60,7 @@ public class SecurityConfig {
                         // 공개 API
                         .requestMatchers(HttpMethod.POST, "/user", "/user/exist").permitAll()
                         .requestMatchers("/jwt/exchange", "/jwt/refresh", "/error").permitAll()
-                        .requestMatchers("/sido", "/gugun", "/dong", "/house/**").permitAll()
+                        .requestMatchers("/sido", "/gugun", "/dong", "/house/**", "/user/image").permitAll()
                         // 인증 필요 API
                         .requestMatchers(HttpMethod.GET, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/user").hasRole(RoleType.USER.name())
@@ -80,8 +68,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // Custom Filter 추가
-                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
-                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 // 예외 처리
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {

@@ -1,6 +1,8 @@
 application-env.yml
 application-oauth.yml
 
+/upload
+
 HELP.md
 .gradle
 build/

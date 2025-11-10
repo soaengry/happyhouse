@@ -30,6 +30,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    // Thumbnail
+    implementation 'net.coobird:thumbnailator:0.4.20'
+
+    // Tika
+    implementation 'org.apache.tika:tika-core:3.0.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'

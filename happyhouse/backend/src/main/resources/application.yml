@@ -39,3 +39,9 @@ server:
 # MyBatis
 mybatis:
   config-location: classpath:/config/mybatis-config.xml
+
+# upload path
+
+app:
+  path:
+    upload: upload

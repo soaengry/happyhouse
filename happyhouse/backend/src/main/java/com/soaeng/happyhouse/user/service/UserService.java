@@ -2,17 +2,12 @@ package com.soaeng.happyhouse.user.service;
 
 import com.soaeng.happyhouse.user.dto.request.UserRequestDto;
 import com.soaeng.happyhouse.user.dto.response.UserResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-    // 자체 로그인 회원 가입 (존재 여부)
-    Boolean existUser(UserRequestDto dto);
-
-    // 자체 로그인 회원 가입
-    Long addUser(UserRequestDto dto);
-
     // 자체 로그인 회원 정보 수정
-    Long updateUser(UserRequestDto dto);
+    Long updateUser(UserRequestDto dto, MultipartFile file);
 
     // 자체/소셜 로그인 회원 탈퇴
     void deleteUser(UserRequestDto dto);

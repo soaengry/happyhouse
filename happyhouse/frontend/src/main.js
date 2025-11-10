@@ -17,6 +17,7 @@ import {
   faGlobe,
   faBars,
   faStar,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { createPinia } from "pinia";
@@ -29,6 +30,7 @@ library.add(faNewspaper);
 library.add(faGlobe);
 library.add(faBars);
 library.add(faStar);
+library.add(faCamera);
 
 const pinia = createPinia();
 const app = createApp(App);

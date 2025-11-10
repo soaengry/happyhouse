@@ -8,78 +8,34 @@ import com.soaeng.happyhouse.user.entity.ProviderType;
 import com.soaeng.happyhouse.user.entity.RoleType;
 import com.soaeng.happyhouse.user.entity.UserEntity;
 import com.soaeng.happyhouse.user.repository.UserRepository;
+import com.soaeng.happyhouse.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl extends DefaultOAuth2UserService implements UserService, UserDetailsService {
+public class UserServiceImpl extends DefaultOAuth2UserService implements UserService {
 
+    private final FileStorageUtil fileStorageUtil;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
-    @Transactional(readOnly = true)
-    @Override
-    public Boolean existUser(UserRequestDto dto) {
-        return userRepository.existsByUsername(dto.getUsername());
-    }
-
-    @Transactional
-    @Override
-    public Long addUser(UserRequestDto dto) {
-
-        if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new IllegalArgumentException("이미 유저가 존재합니다.");
-        }
-
-        UserEntity entity = UserEntity.builder()
-                .username(dto.getUsername())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .isLock(false)
-                .isSocial(false)
-                .roleType(RoleType.USER)
-                .nickname(dto.getNickname())
-                .email(dto.getEmail())
-                .build();
-
-        return userRepository.save(entity).getId();
-    }
-
-    // 자체 로그인
-    @Transactional(readOnly = true)
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        UserEntity entity = userRepository.findByUsernameAndIsLockAndIsSocial(username, false, false)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-
-        return User.builder()
-                .username(entity.getUsername())
-                .password(entity.getPassword())
-                .roles(entity.getRoleType().name())
-                .accountLocked(entity.getIsLock())
-                .build();
-    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -88,7 +44,6 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         // 데이터
-        Map<String, Object> attributes;
         List<GrantedAuthority> authorities;
 
         // provider 제공자별 데이터 획득
@@ -102,41 +57,34 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         };
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
-        Optional<UserEntity> entity = userRepository.findByUsernameAndIsSocial(oAuth2ResponseDto.getUsername(), true);
+        Optional<UserEntity> entity = userRepository.findByUsername(oAuth2ResponseDto.getUsername());
         UserEntity user;
         RoleType role = RoleType.USER;
 
         if (entity.isPresent()) {
             user = entity.get();
-            // role 조회
-            role = entity.get().getRoleType();
-
-            // 기존 유저 업데이트
-            UserRequestDto dto = new UserRequestDto();
-            dto.setNickname(user.getNickname());
-            dto.setEmail(user.getEmail());
-            user.updateUser(dto);
-
-            userRepository.save(user);
         } else {
             // 신규 유저 추가
             UserEntity newUserEntity = UserEntity.builder()
                     .username(oAuth2ResponseDto.getUsername())
-                    .password("")
                     .isLock(false)
-                    .isSocial(true)
                     .providerType(ProviderType.valueOf(registrationId))
                     .roleType(role)
                     .nickname(oAuth2ResponseDto.getNickname())
                     .email(oAuth2ResponseDto.getEmail())
+                    .profileImageUrl(oAuth2ResponseDto.getProfileImage() != null ?
+                            getPhotoUrl(oAuth2ResponseDto.getProfileImage()) : null)
                     .build();
-
             user = userRepository.save(newUserEntity);
         }
 
         authorities = List.of(new SimpleGrantedAuthority(role.name()));
 
         return new CustomOAuth2User(oAuth2User.getAttributes(), authorities, user.getUsername());
+    }
+
+    private String getPhotoUrl(String url) {
+        return fileStorageUtil.saveProfileImage(url);
     }
 
     // 자체/소셜 유저 정보 조회
@@ -148,12 +96,12 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         UserEntity entity = userRepository.findByUsernameAndIsLock(username, false)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다: " + username));
 
-        return new UserResponseDto(username, entity.getIsSocial(), entity.getNickname(), entity.getEmail());
+        return new UserResponseDto(username, entity.getNickname(), entity.getEmail(), entity.getProfileImageUrl());
     }
 
     @Transactional
     @Override
-    public Long updateUser(UserRequestDto dto) throws AccessDeniedException {
+    public Long updateUser(UserRequestDto dto, MultipartFile file) throws AccessDeniedException {
 
         // 본인만 수정 가능 검증
         String sessionUsername = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -162,15 +110,31 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         }
 
         // 조회
-        UserEntity entity = userRepository.findByUsernameAndIsLockAndIsSocial(dto.getUsername(), false, false)
+        UserEntity entity = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(dto.getUsername()));
-        if (dto.getPassword() != null || dto.getPassword().length() > 0) {
-            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
+
         // 회원 정보 수정
-        entity.updateUser(dto);
+        entity.updateNickname(dto.getNickname());
+
+        // 프로필 사진이 변경된 경우만 파일 수정
+        if (dto.isChangedImage()) {
+            String newImageUrl = changeImageFile("profile", entity.getProfileImageUrl(), file);
+            entity.updateProfileImageUrl(newImageUrl);
+        }
 
         return entity.getId();
+    }
+
+    private String changeImageFile(String folderName, String fileUrl, MultipartFile file) {
+        if (fileUrl != null && !fileUrl.equals("null")) {
+            fileStorageUtil.deleteFiles(folderName, List.of(fileUrl));
+        }
+        if (!file.isEmpty()) {
+            List<String> newImageUrl = fileStorageUtil.saveFiles(folderName, List.of(file));
+            return newImageUrl.get(0);
+        }
+
+        return null;
     }
 
     // 자체/소셜 로그인 회원 탈퇴

@@ -7,5 +7,5 @@ public interface OAuth2ResponseDto {
 
     String getNickname();
 
-    String getPicture();
+    String getProfileImage();
 }

@@ -26,7 +26,7 @@ public class GoogleResponseDto implements OAuth2ResponseDto {
     }
 
     @Override
-    public String getPicture() {
+    public String getProfileImage() {
         return attributes.get("picture").toString();
     }
 }

@@ -26,7 +26,7 @@ public class NaverResponseDto implements OAuth2ResponseDto {
     }
 
     @Override
-    public String getPicture() {
+    public String getProfileImage() {
         return (String) response.get("profile_image");
     }
 }

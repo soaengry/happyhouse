@@ -9,6 +9,40 @@
       <div v-else-if="error" class="text-danger">{{ error }}</div>
       <div v-else>
         <form @submit.prevent="handleSubmit">
+          <div class="row">
+            <div class="img mb-4">
+              <div
+                class="mt-3 mb-3 rounded-circle position-relative"
+                style="width: 200px; height: 200px; margin: 0 auto"
+              >
+                <div class="profile-image-box">
+                  <img
+                    :src="
+                      previewUrl || getProfileImageUrl(user.profileImageUrl)
+                    "
+                    alt="프로필 이미지"
+                    class="w-100 h-100 rounded-circle"
+                  />
+                  <button
+                    class="profile-btn"
+                    type="button"
+                    @click="triggerFileInput"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-camera" />
+                  </button>
+
+                  <!-- 숨겨진 파일 선택 input -->
+                  <input
+                    ref="fileInput"
+                    type="file"
+                    accept="image/*"
+                    @change="handleImageSelect"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="form-group">
             <label for="username">아이디</label>
             <input id="username" type="text" v-model="user.username" readonly />
@@ -21,24 +55,6 @@
             <label for="email">이메일</label>
             <input id="email" type="text" v-model="user.email" readonly />
           </div>
-          <div v-if="!user.isSocial">
-            <div class="form-group">
-              <label for="newPassword">현재 비밀번호</label>
-              <input id="newPassword" type="password" v-model="newPassword" />
-            </div>
-            <div class="form-group">
-              <label for="comfirmPassword">새 비밀번호</label>
-              <input
-                id="comfirmPassword"
-                type="password"
-                v-model="comfirmPassword"
-              />
-            </div>
-            <p class="text-danger" v-if="passwordMismatch">
-              비밀번호가 일치하지 않습니다.
-            </p>
-          </div>
-          <p class="info-text" v-else>소셜 로그인 계정입니다.</p>
           <div class="btn-box">
             <button class="logout-btn" type="button" @click="logout">
               로그아웃
@@ -52,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import userService from "@/services/userService";
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
@@ -60,14 +76,15 @@ import { useRouter } from "vue-router";
 const user = ref({});
 const isLoading = ref(true);
 const error = ref("");
-const comfirmPassword = ref("");
-const newPassword = ref("");
 const successMessage = ref("");
-const passwordMismatch = computed(() => {
-  return newPassword.value && comfirmPassword.value !== newPassword.value;
-});
+const fileInput = ref(null);
+const selectedImageFile = ref(null); // 실제 파일 객체
+const previewUrl = ref(""); // 미리보기용 URL
+
 const store = useUserStore();
 const router = useRouter();
+
+const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
 
 onMounted(async () => {
   try {
@@ -86,27 +103,41 @@ async function handleSubmit(e) {
   error.value = "";
   successMessage.value = "";
 
-  if (!user.value.isSocial && comfirmPassword.value !== newPassword.value) {
-    error.value = "비밀번호가 일치하지 않습니다.";
-    return;
+  const formData = new FormData();
+  formData.append("username", user.value.username);
+  formData.append("nickname", user.value.nickname);
+  formData.append("email", user.value.email);
+
+  if (selectedImageFile.value) {
+    formData.append("file", selectedImageFile.value); // ✅ 파일 포함
   }
 
-  const payload = {
-    username: user.value.username,
-    nickname: user.value.nickname,
-    email: user.value.email,
-    password: comfirmPassword.value,
-  };
-
   try {
-    await userService.updateUser(payload);
+    await userService.updateUser(formData); // multipart/form-data로 전송
     successMessage.value = "프로필이 성공적으로 수정되었습니다.";
-    newPassword.value = "";
-    comfirmPassword.value = "";
+    selectedImageFile.value = null;
+    previewUrl.value = "";
   } catch (err) {
     error.value = "프로필 수정에 실패했습니다.";
     console.error(err);
   }
+}
+
+function triggerFileInput() {
+  fileInput.value?.click();
+}
+
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  selectedImageFile.value = file;
+  previewUrl.value = URL.createObjectURL(file); // 브라우저 미리보기 URL 생성
+}
+
+function getProfileImageUrl(fileName) {
+  if (!fileName) return `${BASE_URL}/api/default-profile.png`; // 기본 이미지
+  return `${BASE_URL}/api/user/image?fileName=${encodeURIComponent(fileName)}`;
 }
 
 function logout() {
@@ -117,7 +148,20 @@ function logout() {
 
 <style scoped>
 .container {
-  padding: 0;
+  padding: 1rem;
+}
+
+.profile-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 3rem;
+  width: 3rem;
+  background-color: var(--primary);
+  border-radius: 50%;
+  color: var(--light);
+  border: none;
+  font-size: 1.3rem;
 }
 
 .form-group {

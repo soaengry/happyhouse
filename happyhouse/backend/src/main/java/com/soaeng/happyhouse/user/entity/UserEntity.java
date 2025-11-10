@@ -1,6 +1,5 @@
 package com.soaeng.happyhouse.user.entity;
 
-import com.soaeng.happyhouse.user.dto.request.UserRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,14 +27,8 @@ public class UserEntity {
     @Column(name = "username", unique = true, nullable = false, updatable = false)
     private String username;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "is_lock", nullable = false)
     private Boolean isLock;
-
-    @Column(name = "is_social", nullable = false)
-    private Boolean isSocial;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider_type")
@@ -51,6 +44,9 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     @CreatedDate
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -59,10 +55,11 @@ public class UserEntity {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    public void updateUser(UserRequestDto dto) {
-        this.nickname = dto.getNickname();
-        if (dto.getPassword() != null) {
-            this.password = dto.getPassword();
-        }
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
