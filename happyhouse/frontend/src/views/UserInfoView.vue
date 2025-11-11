@@ -72,6 +72,7 @@ import { ref, onMounted } from "vue";
 import userService from "@/services/userService";
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
+import { useToast } from "vue-toast-notification";
 
 const user = ref({});
 const isLoading = ref(true);
@@ -83,6 +84,7 @@ const previewUrl = ref(""); // 미리보기용 URL
 
 const store = useUserStore();
 const router = useRouter();
+const toast = useToast();
 
 const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
 
@@ -91,8 +93,9 @@ onMounted(async () => {
     const data = await userService.fetchUserInfo();
     user.value = data;
   } catch (err) {
-    error.value = "유저 정보를 불러오지 못했습니다.";
+    toast.error("유저 정보 조회 실패");
     console.error(err);
+    router.push("/login");
   } finally {
     isLoading.value = false;
   }
@@ -109,16 +112,17 @@ async function handleSubmit(e) {
   formData.append("email", user.value.email);
 
   if (selectedImageFile.value) {
-    formData.append("file", selectedImageFile.value); // ✅ 파일 포함
+    formData.append("file", selectedImageFile.value);
   }
 
   try {
-    await userService.updateUser(formData); // multipart/form-data로 전송
-    successMessage.value = "프로필이 성공적으로 수정되었습니다.";
+    await store.updateUserInfo(formData);
+    user.value = store.user; //
+    toast.success("프로필이 수정되었습니다.", { duration: 1500 });
     selectedImageFile.value = null;
     previewUrl.value = "";
   } catch (err) {
-    error.value = "프로필 수정에 실패했습니다.";
+    toast.error("프로필 수정 실패");
     console.error(err);
   }
 }
@@ -136,7 +140,7 @@ function handleImageSelect(event) {
 }
 
 function getProfileImageUrl(fileName) {
-  if (!fileName) return `${BASE_URL}/api/default-profile.png`; // 기본 이미지
+  if (!fileName) return `${BASE_URL}/api/user/image?fileName=default.png`; // 기본 이미지
   return `${BASE_URL}/api/user/image?fileName=${encodeURIComponent(fileName)}`;
 }
 
@@ -149,6 +153,15 @@ function logout() {
 <style scoped>
 .container {
   padding: 1rem;
+}
+
+.profile-image-box {
+  width: 100%;
+  height: 100%;
+}
+
+.profile-image-box img {
+  object-fit: cover;
 }
 
 .profile-btn {

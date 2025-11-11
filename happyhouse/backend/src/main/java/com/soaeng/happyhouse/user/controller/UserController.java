@@ -39,10 +39,7 @@ public class UserController {
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> updateUser(@ModelAttribute UserRequestDto dto, @RequestPart(required = false) MultipartFile file
     ) throws AccessDeniedException {
-        log.debug(dto.toString());
-        log.debug(file.getOriginalFilename());
         if (file != null && !file.isEmpty()) {
-            log.debug(file.getOriginalFilename());
             dto.setChangedImage(true);
         }
         return ResponseEntity.status(200).body(userService.updateUser(dto, file));

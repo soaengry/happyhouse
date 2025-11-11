@@ -18,6 +18,11 @@ export const useUserStore = defineStore("user", {
       }
     },
 
+    async updateUserInfo(payload) {
+      await userService.updateUser(payload);
+      await this.fetchUserInfo();
+    },
+
     logout() {
       this.user = null;
       localStorage.removeItem("accessToken");

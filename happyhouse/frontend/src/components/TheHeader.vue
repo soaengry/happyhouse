@@ -47,10 +47,16 @@
         </nav>
       </div>
       <!-- end of .nav-container -->
-      <router-link to="/user" class="profile-container text-light">
-        <div class="profile-image"></div>
+      <div class="profile-container text-light" @click="handleProfileClick">
+        <div class="profile-image">
+          <img
+            :src="profileImageUrl"
+            alt="프로필 이미지"
+            class="w-100 h-100 rounded-circle"
+          />
+        </div>
         <div class="profile-name">{{ nickname }}</div>
-      </router-link>
+      </div>
     </div>
   </header>
 </template>
@@ -58,16 +64,35 @@
 <script setup>
 import { useUserStore } from "@/stores/userStore";
 import { computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
+const router = useRouter();
 
 const nickname = computed(() => userStore.user?.nickname || "로그인");
+const profileImageUrl = computed(() =>
+  getProfileImageUrl(userStore.user?.profileImageUrl),
+);
+const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
 
 onMounted(() => {
   if (!userStore.user && localStorage.getItem("accessToken")) {
     userStore.fetchUserInfo?.();
   }
 });
+
+function getProfileImageUrl(fileName) {
+  if (!fileName) return `${BASE_URL}/api/user/image?default.png`; // 기본 이미지
+  return `${BASE_URL}/api/user/image?fileName=${encodeURIComponent(fileName)}`;
+}
+
+function handleProfileClick() {
+  if (userStore.user) {
+    router.push("/user");
+  } else {
+    router.push("/login");
+  }
+}
 </script>
 
 <style scoped>
@@ -104,15 +129,44 @@ onMounted(() => {
   padding-left: 0.5rem;
 }
 
+.profile-container {
+  display: flex;
+  cursor: pointer;
+}
+
+.profile-image {
+  height: 2rem;
+  width: 2rem;
+  margin-right: 1rem;
+}
+
+.profile-image img {
+  object-fit: cover;
+}
+
+.profile-name {
+  line-height: 2rem;
+}
+
 @media (max-width: 992px) {
   .header-container {
     width: 60px;
     align-items: center;
   }
+
   .brand-name {
     display: none;
   }
+
   .menu-name {
+    display: none;
+  }
+
+  .profile-image {
+    margin: 0;
+  }
+
+  .profile-name {
     display: none;
   }
 }

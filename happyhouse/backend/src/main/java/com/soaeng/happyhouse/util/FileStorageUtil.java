@@ -32,7 +32,7 @@ public class FileStorageUtil {
 
     @Value("${app.path.upload}")
     private String uploadPath;
-    private String PROFILE_FOLDER = "profile";
+    private final String PROFILE_FOLDER = "profile";
     private final String THUMBNAIL_PREFIX = "thumb_";
 
 
@@ -101,6 +101,7 @@ public class FileStorageUtil {
             try {
                 Files.copy(file.getInputStream(), savePath);
                 String contentType = file.getContentType();
+                log.debug(contentType);
                 if (contentType.startsWith("image")) {
                     if (!folderName.equals(PROFILE_FOLDER)) {
                         Path thumbnailPath = Paths.get(folderPath, THUMBNAIL_PREFIX + savedName);
