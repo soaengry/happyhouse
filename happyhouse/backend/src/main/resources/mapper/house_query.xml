@@ -51,7 +51,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -79,7 +81,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -109,7 +113,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -139,7 +145,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -169,7 +177,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -199,7 +209,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -231,7 +243,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code
@@ -263,7 +277,9 @@
                      hd.deal_year,
                      hd.deal_month,
                      hd.deal_day,
-                     hd.deal_amount
+                     hd.deal_amount,
+                     hi.lat,
+                     hi.lng
               FROM house_deal hd,
                    house_info hi
               WHERE hd.apt_code = hi.apt_code

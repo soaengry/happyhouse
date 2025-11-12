@@ -49,7 +49,73 @@
           <!-- end of .scroll-container -->
         </div>
         <!-- end of .deal-content -->
-        <div class="map-content"></div>
+        <div class="map-content">
+          <div class="btn-box">
+            <button
+              class="apt-btn btn rounded-pill btn-outline-primary"
+              @click="resetMapCenter"
+            >
+              아파트
+            </button>
+            <div class="category">
+              <button
+                id="SC4"
+                data-order="0"
+                class="category-btn btn rounded-pill btn-outline-success"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                학교
+              </button>
+              <button
+                id="PO3"
+                data-order="1"
+                class="category-btn btn rounded-pill btn-outline-dark"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                공공기관
+              </button>
+              <button
+                id="BK9"
+                data-order="2"
+                class="category-btn btn rounded-pill btn-outline-danger"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                은행
+              </button>
+              <button
+                id="HP8"
+                data-order="3"
+                class="category-btn btn rounded-pill btn-outline-warning"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                병원
+              </button>
+              <button
+                id="CE7"
+                data-order="4"
+                class="category-btn btn rounded-pill btn-outline-secondary"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                카페
+              </button>
+              <button
+                id="CS2"
+                data-order="5"
+                class="category-btn btn rounded-pill btn-outline-info"
+                @click="btnToggle"
+                @mouseup="setCategoryOrder"
+              >
+                편의점
+              </button>
+            </div>
+          </div>
+          <div id="map"></div>
+        </div>
       </div>
       <!-- end of .modal-body -->
     </div>
@@ -60,7 +126,7 @@
 import { useHouseStore } from "@/stores/houseStore";
 import { makeDateStr } from "@/utils/date";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
+import { onMounted, reactive } from "vue";
 
 const props = defineProps({
   house: Object,
@@ -70,12 +136,81 @@ const houseStore = useHouseStore();
 const emit = defineEmits(["close"]);
 const { dealCount, dealList } = storeToRefs(houseStore);
 
+const state = reactive({
+  map: null,
+  initCenter: null,
+  markers: [],
+  infos: [],
+  results: [],
+  currCategory: "",
+  order: "",
+  places: null,
+});
+
+const initMap = () => {
+  const container = document.getElementById("map"); // 지도를 표시할 div
+  const center = new window.kakao.maps.LatLng(props.house.lat, props.house.lng);
+  state.initCenter = center;
+
+  const options = {
+    center,
+    level: 4,
+  };
+
+  state.map = new window.kakao.maps.Map(container, options);
+  state.map.setZoomable(false);
+
+  // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+  const mapTypeControl = new window.kakao.maps.MapTypeControl();
+
+  // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+  state.map.addControl(
+    mapTypeControl,
+    window.kakao.maps.ControlPosition.TOPRIGHT, // 컨트롤이 표시될 위치
+  );
+
+  // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성
+  const zoomControl = new window.kakao.maps.ZoomControl();
+  state.map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
+  const marker = new window.kakao.maps.Marker({
+    position: new window.kakao.maps.LatLng(props.house.lat, props.house.lng),
+    image: new window.kakao.maps.MarkerImage(
+      "assets/img/markers/marker_primary.png",
+      new window.kakao.maps.Size(24, 35),
+    ),
+  });
+  marker.setMap(state.map);
+};
+
+const loadScript = () => {
+  const appKey = process.env.VUE_APP_KAKAO_KEY;
+  const script = document.createElement("script");
+
+  script.onload = () => window.kakao.maps.load(initMap);
+  script.src = `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services`;
+  script.addEventListener("load", () => window.kakao.maps.load(initMap));
+
+  document.head.appendChild(script);
+};
+
 onMounted(async () => {
   await houseStore.getDealList(props.house.aptCode);
+
+  if (window.kakao && window.kakao.maps) {
+    initMap();
+  } else {
+    loadScript();
+  }
 });
 
 function onClose() {
   emit("close");
+}
+
+function resetMapCenter() {
+  if (state.map && state.initCenter) {
+    state.map.setCenter(state.initCenter);
+  }
 }
 </script>
 
@@ -97,7 +232,9 @@ function onClose() {
   background: white;
   border-radius: 0.5rem;
   width: 80%;
-  max-height: 80vh;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -109,6 +246,7 @@ function onClose() {
   padding: 1rem;
   color: var(--light);
   font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .modal-header h4 {
@@ -154,7 +292,8 @@ function onClose() {
 .modal-body {
   display: flex;
   grid-area: 1rem;
-  overflow: hidden;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .deal-content {
@@ -162,6 +301,7 @@ function onClose() {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  margin-right: 1rem;
 }
 
 .scroll-container {
@@ -185,7 +325,27 @@ function onClose() {
 
 .map-content {
   flex: 1;
-  min-width: 0;
+  min-height: 400px;
+}
+
+.btn-box {
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  font-size: small;
+  padding: 0.2rem 0.5rem;
+}
+
+.category-btn {
+  margin-left: 0.2rem;
+}
+
+#map {
+  width: 100%;
+  height: 400px;
 }
 
 .deal-content table {
@@ -230,6 +390,11 @@ function onClose() {
 @media (max-width: 992px) {
   .modal-body {
     flex-direction: column;
+  }
+
+  .deal-content {
+    margin-right: 0;
+    margin-bottom: 2rem;
   }
 }
 </style>
