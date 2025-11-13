@@ -4,6 +4,7 @@ import com.soaeng.happyhouse.filter.JwtFilter;
 import com.soaeng.happyhouse.handler.RefreshTokenLogoutHandler;
 import com.soaeng.happyhouse.jwt.service.JwtService;
 import com.soaeng.happyhouse.user.entity.RoleType;
+import com.soaeng.happyhouse.user.service.UserServiceImpl;
 import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler socialSuccessHandler;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
+    private final UserServiceImpl userService;
     @Value("${server.host.front}")
     private String FRONT_HOST;
 //    @Value("${spring.security.debug:false}")
@@ -65,10 +67,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/user").hasRole(RoleType.USER.name())
                         .requestMatchers(HttpMethod.DELETE, "/user").hasRole(RoleType.USER.name())
+                        .requestMatchers("/bookmark").hasRole(RoleType.USER.name())
                         .anyRequest().authenticated()
                 )
                 // Custom Filter 추가
-                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class)
                 // 예외 처리
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {

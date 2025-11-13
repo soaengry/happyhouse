@@ -56,12 +56,12 @@ public class HouseDaoTests {
         dto.setLimit(10);
         dto.setOffset(0);
         dto.setDongCode(dongCode);
-        log.info(dao.getAllDealList(dto).toString());
+        log.info(dao.getAllHouseList(dto).toString());
     }
 
     @Test
     void testGetAllDealCount() {
-        log.info(String.valueOf(dao.getAllDealCount()));
+        log.info(String.valueOf(dao.getAllHouseCount()));
     }
 
     @Test
@@ -70,12 +70,12 @@ public class HouseDaoTests {
         dto.setLimit(10);
         dto.setOffset(0);
         dto.setGugunCode(gugunCode);
-        log.info(dao.getGugunDealList(dto).toString());
+        log.info(dao.getGugunHouseList(dto).toString());
     }
 
     @Test
     void testGetGugunDealCount() {
-        log.info(String.valueOf(dao.getGugunDealCount(gugunCode)));
+        log.info(String.valueOf(dao.getGugunHouseCount(gugunCode)));
     }
 
     @Test
@@ -84,12 +84,12 @@ public class HouseDaoTests {
         dto.setLimit(10);
         dto.setOffset(0);
         dto.setDongCode(dongCode);
-        dao.getDongDealList(dto).forEach(dongDeal -> log.info(String.valueOf(dongDeal)));
+        dao.getDongHouseList(dto).forEach(dongDeal -> log.info(String.valueOf(dongDeal)));
     }
 
     @Test
     void testGetDongDealCount() {
-        log.info(String.valueOf(dao.getDongDealCount(dongCode)));
+        log.info(String.valueOf(dao.getDongHouseCount(dongCode)));
     }
 
     @Test
@@ -98,12 +98,12 @@ public class HouseDaoTests {
         dto.setLimit(10);
         dto.setOffset(0);
         dto.setKeyword(keyword);
-        dao.getKeywordDealList(dto).forEach(deal -> log.info(String.valueOf(deal)));
+        dao.getKeywordHouseList(dto).forEach(deal -> log.info(String.valueOf(deal)));
     }
 
     @Test
     void testGetKeywordDealCount() {
-        log.info(String.valueOf(dao.getKeywordDealCount(keyword)));
+        log.info(String.valueOf(dao.getKeywordHouseCount(keyword)));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class HouseDaoTests {
         dto.setOffset(0);
         dto.setSidoCode(sidoCode);
         dto.setKeyword(keyword);
-        dao.getSidoKeywordDealList(dto).forEach(deal -> log.info(deal.toString()));
+        dao.getSidoKeywordHouseList(dto).forEach(deal -> log.info(deal.toString()));
     }
 
     @Test
@@ -121,8 +121,9 @@ public class HouseDaoTests {
         Map<String, Object> map = new HashMap<>();
         map.put("sidoCode", sidoCode);
         map.put("keyword", keyword);
-        log.info(String.valueOf(dao.getSidoKeywordDealCount(map)));
+        log.info(String.valueOf(dao.getSidoKeywordHouseCount(map)));
     }
+
     @Test
     void testGetGugunKeywordDealList() {
         HouseParamDto dto = new HouseParamDto();
@@ -130,7 +131,7 @@ public class HouseDaoTests {
         dto.setOffset(0);
         dto.setGugunCode(gugunCode);
         dto.setKeyword(keyword);
-        dao.getGugunKeywordDealList(dto).forEach(deal -> log.info(deal.toString()));
+        dao.getGugunKeywordHouseList(dto).forEach(deal -> log.info(deal.toString()));
     }
 
     @Test
@@ -138,7 +139,7 @@ public class HouseDaoTests {
         Map<String, Object> map = new HashMap<>();
         map.put("gugunCode", gugunCode);
         map.put("keyword", keyword);
-        log.info(String.valueOf(dao.getGugunKeywordDealCount(map)));
+        log.info(String.valueOf(dao.getGugunKeywordHouseCount(map)));
     }
 
     @Test
@@ -148,7 +149,7 @@ public class HouseDaoTests {
         dto.setOffset(0);
         dto.setDongCode(dongCode);
         dto.setKeyword(keyword);
-        dao.getDongKeywordDealList(dto).forEach(deal -> log.info(deal.toString()));
+        dao.getDongKeywordHouseList(dto).forEach(deal -> log.info(deal.toString()));
     }
 
     @Test
@@ -156,7 +157,7 @@ public class HouseDaoTests {
         Map<String, Object> map = new HashMap<>();
         map.put("dongCode", dongCode);
         map.put("keyword", keyword);
-        log.info(String.valueOf(dao.getDongKeywordDealCount(map)));
+        log.info(String.valueOf(dao.getDongKeywordHouseCount(map)));
     }
 
     @Test

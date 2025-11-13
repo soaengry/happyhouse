@@ -6,6 +6,7 @@ import com.soaeng.happyhouse.house.dto.GugunDto;
 import com.soaeng.happyhouse.house.dto.SidoDto;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
 import com.soaeng.happyhouse.house.dto.response.HouseDto;
+import com.soaeng.happyhouse.user.entity.UserEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -28,44 +29,44 @@ public interface HouseService {
 
     /* 매물별 최근 거래 목록 */
     // 전체
-    List<HouseDto> getAllDealList(HouseParamDto param);
+    List<HouseDto> getAllHouseList(UserEntity user, HouseParamDto param);
 
-    int getAllDealCount();
+    int getAllHouseCount();
 
     // 시/도
-    List<HouseDto> getSidoDealList(HouseParamDto param);
+    List<HouseDto> getSidoHouseList(UserEntity user, HouseParamDto param);
 
-    int getSidoDealCount(Long sidoCode);
+    int getSidoHouseCount(Long sidoCode);
 
     // 구/군
-    List<HouseDto> getGugunDealList(HouseParamDto param);
+    List<HouseDto> getGugunHouseList(UserEntity user, HouseParamDto param);
 
-    int getGugunDealCount(Long gugunCode);
+    int getGugunHouseCount(Long gugunCode);
 
     // 동
-    List<HouseDto> getDongDealList(HouseParamDto param);
+    List<HouseDto> getDongHouseList(UserEntity user, HouseParamDto param);
 
-    int getDongDealCount(Long dongCode);
+    int getDongHouseCount(Long dongCode);
 
     // 매물명 검색
-    List<HouseDto> getKeywordDealList(HouseParamDto param);
+    List<HouseDto> getKeywordHouseList(UserEntity user, HouseParamDto param);
 
-    int getKeywordDealCount(String keyword);
+    int getKeywordHouseCount(String keyword);
 
     // 시 매물명 검색
-    List<HouseDto> getSidoKeywordDealList(HouseParamDto param);
+    List<HouseDto> getSidoKeywordHouseList(UserEntity user, HouseParamDto param);
 
-    int getSidoKeywordDealCount(Map<String, Object> param);
+    int getSidoKeywordHouseCount(Map<String, Object> param);
 
     // 구/군 매물명 검색
-    List<HouseDto> getGugunKeywordDealList(HouseParamDto param);
+    List<HouseDto> getGugunKeywordHouseList(UserEntity user, HouseParamDto param);
 
-    int getGugunKeywordDealCount(Map<String, Object> param);
+    int getGugunKeywordHouseCount(Map<String, Object> param);
 
     // 동별 매물명 검색
-    List<HouseDto> getDongKeywordDealList(HouseParamDto param);
+    List<HouseDto> getDongKeywordHouseList(UserEntity user, HouseParamDto param);
 
-    int getDongKeywordDealCount(Map<String, Object> param);
+    int getDongKeywordHouseCount(Map<String, Object> param);
 
 
     /* 거래 상세 */

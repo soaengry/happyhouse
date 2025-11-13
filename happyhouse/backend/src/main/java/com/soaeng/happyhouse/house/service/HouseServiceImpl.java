@@ -7,6 +7,9 @@ import com.soaeng.happyhouse.house.dto.GugunDto;
 import com.soaeng.happyhouse.house.dto.SidoDto;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
 import com.soaeng.happyhouse.house.dto.response.HouseDto;
+import com.soaeng.happyhouse.house.entity.BookmarkHouse;
+import com.soaeng.happyhouse.house.repository.BookmarkHouseRepository;
+import com.soaeng.happyhouse.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import java.util.Map;
 public class HouseServiceImpl implements HouseService {
 
     private final HouseDao houseDao;
+    private final BookmarkHouseRepository bookmarkHouseRepository;
 
     @Override
     public BaseAddressDto getBaseAddress(Long dongCode) {
@@ -42,107 +46,115 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public List<HouseDto> getAllDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getAllDealList(param);
+    public List<HouseDto> getAllHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getAllHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getAllDealCount() {
-        return houseDao.getAllDealCount();
+    public int getAllHouseCount() {
+        return houseDao.getAllHouseCount();
     }
 
     @Override
-    public List<HouseDto> getSidoDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getAllDealList(param);
+    public List<HouseDto> getSidoHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getAllHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getSidoDealCount(Long sidoCode) {
-        return houseDao.getSidoDealCount(sidoCode);
+    public int getSidoHouseCount(Long sidoCode) {
+        return houseDao.getSidoHouseCount(sidoCode);
     }
 
     @Override
-    public List<HouseDto> getGugunDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getGugunDealList(param);
+    public List<HouseDto> getGugunHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getGugunHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getGugunDealCount(Long gugunCode) {
-        return houseDao.getGugunDealCount(gugunCode);
+    public int getGugunHouseCount(Long gugunCode) {
+        return houseDao.getGugunHouseCount(gugunCode);
     }
 
     @Override
-    public List<HouseDto> getDongDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getDongDealList(param);
+    public List<HouseDto> getDongHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getDongHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getDongDealCount(Long dongCode) {
-        return houseDao.getDongDealCount(dongCode);
+    public int getDongHouseCount(Long dongCode) {
+        return houseDao.getDongHouseCount(dongCode);
     }
 
     @Override
-    public List<HouseDto> getKeywordDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getKeywordDealList(param);
+    public List<HouseDto> getKeywordHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getKeywordHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getKeywordDealCount(String keyword) {
-        return houseDao.getKeywordDealCount(keyword);
+    public int getKeywordHouseCount(String keyword) {
+        return houseDao.getKeywordHouseCount(keyword);
     }
 
     @Override
-    public List<HouseDto> getSidoKeywordDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getSidoKeywordDealList(param);
+    public List<HouseDto> getSidoKeywordHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getSidoKeywordHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getSidoKeywordDealCount(Map<String, Object> param) {
-        return houseDao.getSidoKeywordDealCount(param);
+    public int getSidoKeywordHouseCount(Map<String, Object> param) {
+        return houseDao.getSidoKeywordHouseCount(param);
     }
 
     @Override
-    public List<HouseDto> getGugunKeywordDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getGugunKeywordDealList(param);
+    public List<HouseDto> getGugunKeywordHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getGugunKeywordHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getGugunKeywordDealCount(Map<String, Object> param) {
-        return houseDao.getGugunKeywordDealCount(param);
+    public int getGugunKeywordHouseCount(Map<String, Object> param) {
+        return houseDao.getGugunKeywordHouseCount(param);
     }
 
     @Override
-    public List<HouseDto> getDongKeywordDealList(HouseParamDto param) {
-        List<HouseDto> houseDtoList = houseDao.getDongKeywordDealList(param);
+    public List<HouseDto> getDongKeywordHouseList(UserEntity user, HouseParamDto param) {
+        List<HouseDto> houseDtoList = houseDao.getDongKeywordHouseList(param);
         setBaseAddressList(houseDtoList);
+        setBookmarkList(user, houseDtoList);
 
         return houseDtoList;
     }
 
     @Override
-    public int getDongKeywordDealCount(Map<String, Object> param) {
-        return houseDao.getDongKeywordDealCount(param);
+    public int getDongKeywordHouseCount(Map<String, Object> param) {
+        return houseDao.getDongKeywordHouseCount(param);
     }
 
     @Override
@@ -157,5 +169,14 @@ public class HouseServiceImpl implements HouseService {
 
     private void setBaseAddressList(List<HouseDto> houseDtoList) {
         houseDtoList.forEach(houseDto -> houseDto.setAddress(houseDao.getBaseAddress(houseDto.getDongCode())));
+    }
+
+    private void setBookmarkList(UserEntity user, List<HouseDto> houseDtoList) {
+        List<Long> bookmarkHouseList = bookmarkHouseRepository.findByUser(user)
+                .stream()
+                .map(BookmarkHouse::getAptCode)
+                .toList();
+
+        houseDtoList.forEach(houseDto -> houseDto.setBookmark(bookmarkHouseList.contains((long) houseDto.getAptCode())));
     }
 }

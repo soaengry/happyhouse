@@ -4,10 +4,12 @@ import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
 import com.soaeng.happyhouse.house.dto.response.HouseDto;
 import com.soaeng.happyhouse.house.dto.response.HouseResponseDto;
 import com.soaeng.happyhouse.house.service.HouseService;
+import com.soaeng.happyhouse.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,52 +31,58 @@ public class HouseController {
     private static final int FAIL = -1;
 
     @GetMapping("")
-    public ResponseEntity<HouseResponseDto> getHouseList(HouseParamDto param) {
-        log.info(param.toString());
+    public ResponseEntity<HouseResponseDto> getHouseList(@AuthenticationPrincipal UserEntity user, HouseParamDto param) {
         HouseResponseDto response = new HouseResponseDto();
 
         if (param.getKeyword() != null) {
             if (param.getDongCode() > 0) {
-                response.setHouseList(service.getDongKeywordDealList(param));
+                log.debug("getDongKeywordHouseList");
+                response.setHouseList(service.getDongKeywordHouseList(user, param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("dongCode", param.getDongCode());
                 map.put("keyword", param.getKeyword());
-                response.setCount(service.getDongKeywordDealCount(map));
+                response.setCount(service.getDongKeywordHouseCount(map));
             } else if (param.getGugunCode() > 0) {
-                response.setHouseList(service.getGugunKeywordDealList(param));
+                log.debug("getGugunKeywordHouseList");
+                response.setHouseList(service.getGugunKeywordHouseList(user, param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("gugunCode", param.getGugunCode());
                 map.put("keyword", param.getKeyword());
-                response.setCount(service.getGugunKeywordDealCount(map));
+                response.setCount(service.getGugunKeywordHouseCount(map));
             } else if (param.getSidoCode() > 0) {
-                response.setHouseList(service.getSidoKeywordDealList(param));
+                log.debug("getSidoKeywordHouseList");
+                response.setHouseList(service.getSidoKeywordHouseList(user, param));
                 Map<String, Object> map = new HashMap<>();
                 map.put("sidoCode", param.getSidoCode());
                 map.put("keyword", param.getKeyword());
-                response.setCount(service.getSidoKeywordDealCount(map));
+                response.setCount(service.getSidoKeywordHouseCount(map));
             } else {
-                response.setHouseList(service.getKeywordDealList(param));
-                response.setCount(service.getKeywordDealCount(param.getKeyword()));
+                log.debug("getKeywordHouseList");
+                response.setHouseList(service.getKeywordHouseList(user, param));
+                response.setCount(service.getKeywordHouseCount(param.getKeyword()));
             }
         } else {
             if (param.getDongCode() > 0) {
-                response.setHouseList(service.getDongDealList(param));
-                response.setCount(service.getDongDealCount(param.getDongCode()));
+                log.debug("getDongHouseList");
+                response.setHouseList(service.getDongHouseList(user, param));
+                response.setCount(service.getDongHouseCount(param.getDongCode()));
             } else if (param.getGugunCode() > 0) {
-                response.setHouseList(service.getGugunDealList(param));
-                response.setCount(service.getGugunDealCount(param.getGugunCode()));
+                log.debug("getGugunHouseList");
+                response.setHouseList(service.getGugunHouseList(user, param));
+                response.setCount(service.getGugunHouseCount(param.getGugunCode()));
             } else if (param.getSidoCode() > 0) {
-                response.setHouseList(service.getSidoDealList(param));
-                response.setCount(service.getSidoDealCount(param.getSidoCode()));
+                log.debug("getSidoHouseList");
+                response.setHouseList(service.getSidoHouseList(user, param));
+                response.setCount(service.getSidoHouseCount(param.getSidoCode()));
             } else {
-                List<HouseDto> houseList = service.getAllDealList(param);
+                log.debug("getAllHouseList");
+                List<HouseDto> houseList = service.getAllHouseList(user, param);
                 response.setHouseList(houseList);
-                response.setCount(service.getAllDealCount());
+                response.setCount(service.getAllHouseCount());
             }
         }
 
         response.setResult(response.getHouseList() != null ? SUCCESS : FAIL);
-
         return response.getResult() > 0 ?
                 new ResponseEntity<>(response, HttpStatus.OK) :
                 new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

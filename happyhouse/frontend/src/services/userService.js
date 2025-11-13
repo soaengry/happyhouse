@@ -1,9 +1,9 @@
 import api from ".";
+import { fetchData } from "./apiHelper";
 
 const userService = {
   async fetchUserInfo() {
-    const { data } = await api.get("/user");
-    return data;
+    return fetchData("/user");
   },
   async updateUser(userData) {
     const { data } = await api.put("/user", userData, {

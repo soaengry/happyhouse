@@ -16,6 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -31,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl extends DefaultOAuth2UserService implements UserService {
+public class UserServiceImpl extends DefaultOAuth2UserService implements UserService, UserDetailsService {
 
     private final FileStorageUtil fileStorageUtil;
     private final UserRepository userRepository;
@@ -42,9 +44,6 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
 
         // 부모 메소드 호출
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
-        // 데이터
-        List<GrantedAuthority> authorities;
 
         // provider 제공자별 데이터 획득
         String registrationId = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
@@ -78,7 +77,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
             user = userRepository.save(newUserEntity);
         }
 
-        authorities = List.of(new SimpleGrantedAuthority(role.name()));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role.name()));
 
         return new CustomOAuth2User(oAuth2User.getAttributes(), authorities, user.getUsername());
     }
@@ -87,7 +86,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         return fileStorageUtil.saveProfileImage(url);
     }
 
-    // 자체/소셜 유저 정보 조회
+    // 유저 정보 조회
     @Transactional(readOnly = true)
     @Override
     public UserResponseDto readUser() {
@@ -137,7 +136,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         return null;
     }
 
-    // 자체/소셜 로그인 회원 탈퇴
+    // 회원 탈퇴
     @Transactional
     public void deleteUser(UserRequestDto dto) throws AccessDeniedException {
 
@@ -158,5 +157,12 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
 
         // Refresh 토큰 제거
         jwtService.removeRefreshUser(dto.getUsername());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsernameAndIsLock(username, false)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다: " + username));
+
     }
 }

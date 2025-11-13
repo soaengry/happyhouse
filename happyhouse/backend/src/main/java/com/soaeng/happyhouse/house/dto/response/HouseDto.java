@@ -50,12 +50,19 @@ public class HouseDto {
     // 법정동
     private String address;
 
+    // 북마크 여부
+    private boolean isBookmarked;
+
     public void setAddress(BaseAddressDto baseAddressDto) {
         StringBuilder sb = new StringBuilder();
         sb.append(baseAddressDto.getSidoName()).append(" ");
         sb.append(baseAddressDto.getGugunName()).append(" ");
         sb.append(baseAddressDto.getDongName());
         this.address = sb.toString();
+    }
+
+    public void setBookmark(boolean isBookmarked) {
+        this.isBookmarked = isBookmarked;
     }
 
 }

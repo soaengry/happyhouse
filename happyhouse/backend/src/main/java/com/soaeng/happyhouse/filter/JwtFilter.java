@@ -1,5 +1,6 @@
 package com.soaeng.happyhouse.filter;
 
+import com.soaeng.happyhouse.user.service.UserServiceImpl;
 import com.soaeng.happyhouse.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -23,6 +25,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserServiceImpl userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,9 +41,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (jwtUtil.isValid(accessToken, true)) {
             String username = jwtUtil.getUsername(accessToken);
+            UserDetails userDetails = userService.loadUserByUsername(username);
             String role = jwtUtil.getRole(accessToken);
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-            Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -66,15 +70,8 @@ public class JwtFilter extends OncePerRequestFilter {
             return true;
         }
 
-        // POST /user/exist → JWT 체크 필요 없음
-        if (path.equals("/user/exist") && "POST".equalsIgnoreCase(method)) {
-            return true;
-        }
-
         // 인증 없이 접근 가능한 경로 목록
         return path.equals("/jwt/exchange")
-                || path.equals("/jwt/refresh")
-                || path.startsWith("/sido")
-                || path.startsWith("/house");
+                || path.equals("/jwt/refresh");
     }
 }

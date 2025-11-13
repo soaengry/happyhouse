@@ -30,44 +30,44 @@ public interface HouseDao {
 
     /* 매물별 최근 거래 목록 */
     // 전체
-    List<HouseDto> getAllDealList(HouseParamDto param);
+    List<HouseDto> getAllHouseList(HouseParamDto param);
 
-    int getAllDealCount();
+    int getAllHouseCount();
 
     // 시/도
     List<HouseDto> getSidoDealList(HouseParamDto param);
 
-    int getSidoDealCount(Long sidoCode);
+    int getSidoHouseCount(Long sidoCode);
 
     // 구/군
-    List<HouseDto> getGugunDealList(HouseParamDto param);
+    List<HouseDto> getGugunHouseList(HouseParamDto param);
 
-    int getGugunDealCount(Long gugunCode);
+    int getGugunHouseCount(Long gugunCode);
 
     // 동
-    List<HouseDto> getDongDealList(HouseParamDto param);
+    List<HouseDto> getDongHouseList(HouseParamDto param);
 
-    int getDongDealCount(Long dongCode);
+    int getDongHouseCount(Long dongCode);
 
     // 매물명 검색
-    List<HouseDto> getKeywordDealList(HouseParamDto param);
+    List<HouseDto> getKeywordHouseList(HouseParamDto param);
 
-    int getKeywordDealCount(String keyword);
+    int getKeywordHouseCount(String keyword);
 
     // 시 매물명 검색
-    List<HouseDto> getSidoKeywordDealList(HouseParamDto param);
+    List<HouseDto> getSidoKeywordHouseList(HouseParamDto param);
 
-    int getSidoKeywordDealCount(Map<String, Object> param);
+    int getSidoKeywordHouseCount(Map<String, Object> param);
 
     // 구/군 매물명 검색
-    List<HouseDto> getGugunKeywordDealList(HouseParamDto param);
+    List<HouseDto> getGugunKeywordHouseList(HouseParamDto param);
 
-    int getGugunKeywordDealCount(Map<String, Object> param);
+    int getGugunKeywordHouseCount(Map<String, Object> param);
 
     // 동별 매물명 검색
-    List<HouseDto> getDongKeywordDealList(HouseParamDto param);
+    List<HouseDto> getDongKeywordHouseList(HouseParamDto param);
 
-    int getDongKeywordDealCount(Map<String, Object> param);
+    int getDongKeywordHouseCount(Map<String, Object> param);
 
 
     /* 거래 상세 */
@@ -75,5 +75,7 @@ public interface HouseDao {
     List<HouseDto> getHouseDealList(Integer aptCode);
 
     int getHouseDealCount(Integer aptCode);
+
+    List<HouseDto> getBookmarkHouseList(List<Long> aptCodes);
 
 }

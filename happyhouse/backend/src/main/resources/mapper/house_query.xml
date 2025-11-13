@@ -40,7 +40,7 @@
 
     <!--  # 매물별 최근 거래 목록 -->
     <!--  전체  -->
-    <select id="getAllDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getAllHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -64,13 +64,13 @@
     </select>
 
     <!--  전체 총 수  -->
-    <select id="getAllDealCount" resultType="int">
+    <select id="getAllHouseCount" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info;
     </select>
 
     <!--  시/도  -->
-    <select id="getSidoDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getSidoHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -95,14 +95,14 @@
     </select>
 
     <!--  시/도 총 수  -->
-    <select id="getSidoDealCount" parameterType="long" resultType="int">
+    <select id="getSidoHouseCount" parameterType="long" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2);
     </select>
 
     <!--  구/군  -->
-    <select id="getGugunDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getGugunHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -127,14 +127,14 @@
     </select>
 
     <!--  구/군 총 수  -->
-    <select id="getGugunDealCount" parameterType="long" resultType="int">
+    <select id="getGugunHouseCount" parameterType="long" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5);
     </select>
 
     <!--  동별 아파트 총 수  -->
-    <select id="getDongDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getDongHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -159,14 +159,14 @@
     </select>
 
     <!--  동 총 수  -->
-    <select id="getDongDealCount" parameterType="long" resultType="int">
+    <select id="getDongHouseCount" parameterType="long" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE dong_code = #{dongCode};
     </select>
 
     <!--  매물명 검색 목록  -->
-    <select id="getKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getKeywordHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -191,14 +191,14 @@
     </select>
 
     <!--  아파트 검색 총 수  -->
-    <select id="getKeywordDealCount" parameterType="string" resultType="int">
+    <select id="getKeywordHouseCount" parameterType="string" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE apt_name LIKE CONCAT('%', #{keyword}, '%');
     </select>
 
     <!--  시 아파트 검색 목록  -->
-    <select id="getSidoKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getSidoKeywordHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -224,7 +224,7 @@
     </select>
 
     <!--  시 아파트 검색 총 수  -->
-    <select id="getSidoKeywordDealCount" parameterType="map" resultType="int">
+    <select id="getSidoKeywordHouseCount" parameterType="map" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
@@ -232,7 +232,7 @@
     </select>
 
     <!--  구/군 아파트 검색 목록  -->
-    <select id="getGugunKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getGugunKeywordHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -258,7 +258,7 @@
     </select>
 
     <!--  구/군 아파트 검색 총 수  -->
-    <select id="getGugunKeywordDealCount" parameterType="map" resultType="int">
+    <select id="getGugunKeywordHouseCount" parameterType="map" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
@@ -266,7 +266,7 @@
     </select>
 
     <!--  동 아파트 검색 목록  -->
-    <select id="getDongKeywordDealList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+    <select id="getDongKeywordHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
             resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT *
         FROM (SELECT hd.no,
@@ -291,7 +291,7 @@
         OFFSET #{offset};
     </select>
     <!--  동 아파트 검색 총 수  -->
-    <select id="getDongKeywordDealCount" parameterType="map" resultType="int">
+    <select id="getDongKeywordHouseCount" parameterType="map" resultType="int">
         SELECT COUNT(DISTINCT apt_code)
         FROM house_info
         WHERE dong_code = #{dongCode}
@@ -329,4 +329,32 @@
         WHERE apt_code = #{aptCode};
     </select>
 
+    <!--  # 북마크  -->
+    <!--  아파트별 즐겨찾기  -->
+    <select id="getBookmarkHouseList" parameterType="list"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+        SELECT *
+        FROM (
+        SELECT hd.no,
+        hi.apt_code,
+        hi.apt_name,
+        hi.dong_code,
+        hi.build_year,
+        hd.deal_year,
+        hd.deal_month,
+        hd.deal_day,
+        hd.deal_amount,
+        hi.lat,
+        hi.lng
+        FROM house_deal hd
+        JOIN house_info hi ON hd.apt_code = hi.apt_code
+        WHERE hd.apt_code IN
+        <foreach item="aptCode" collection="aptCodes" open="(" separator="," close=")">
+            #{aptCode}
+        </foreach>
+        ORDER BY hd.no DESC
+        LIMIT 18446744073709551615
+        ) hh
+        GROUP BY apt_code;
+    </select>
 </mapper>

@@ -116,6 +116,7 @@ onMounted(async () => {
   await addressStore.getSidoList();
   houseStore.resetHouseList();
   houseStore.fetchNextPage();
+  houseStore.loadBookmarks();
   observer = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting && !isLoading.value) {
@@ -185,12 +186,18 @@ function closeModal() {
 
 .scroll-container {
   padding: 1rem 0;
+  min-height: 80vh;
 }
 
 .card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* ✅ 2열 */
   gap: 1rem;
+}
+
+select,
+input {
+  margin-right: 0.5rem;
 }
 
 /* 반응형: 모바일에서는 1열 */

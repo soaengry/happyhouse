@@ -8,6 +8,7 @@
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+
 const router = useRouter();
 const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
 

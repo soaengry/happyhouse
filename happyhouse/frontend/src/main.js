@@ -24,6 +24,8 @@ import {
   faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+
 import { createPinia } from "pinia";
 
 library.add(faMagnifyingGlass);
@@ -35,6 +37,7 @@ library.add(faGlobe);
 library.add(faBars);
 library.add(faStar);
 library.add(faCamera);
+library.add(regularStar);
 
 const pinia = createPinia();
 const app = createApp(App);

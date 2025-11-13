@@ -14,7 +14,10 @@ export const useHouseStore = defineStore("house", {
     keyword: "",
     aptCode: 0,
     isLoading: false,
+    bookmarked: false,
+    bookmarks: [],
   }),
+
   actions: {
     resetHouseList() {
       this.houseList = [];
@@ -22,14 +25,15 @@ export const useHouseStore = defineStore("house", {
       this.currentPage = 1;
       this.hasMore = true;
     },
+
     async fetchNextPage() {
       if (!this.hasMore || this.isLoading) return;
 
       this.isLoading = true;
       try {
         const params = {
-          limit: 10,
-          offset: (this.currentPage - 1) * 10,
+          limit: 16,
+          offset: (this.currentPage - 1) * 16,
           keyword: this.keyword,
           sidoCode: this.sidoCode,
           gugunCode: this.gugunCode,
@@ -71,6 +75,7 @@ export const useHouseStore = defineStore("house", {
         this.isLoading = false;
       }
     },
+
     async getDealList(aptCode) {
       this.isLoading = true;
       try {
@@ -79,6 +84,27 @@ export const useHouseStore = defineStore("house", {
         this.dealCount = count;
       } finally {
         this.isLoading = false;
+      }
+    },
+
+    async loadBookmarks() {
+      const { houseList } = await houseService.getBookmarks();
+      this.bookmarks = houseList.map((h) => h.aptCode);
+    },
+
+    async toggleBookmark(aptCode) {
+      const isBookmarked = this.bookmarks.includes(aptCode);
+
+      if (isBookmarked) {
+        await houseService.removeBookmark(aptCode);
+        this.bookmarks = this.bookmarks.filter((code) => code !== aptCode);
+      } else {
+        await houseService.addBookmark(aptCode);
+        this.bookmarks.push(aptCode);
+      }
+      const target = this.houseList.find((h) => h.aptCode === aptCode);
+      if (target) {
+        target.bookmarked = !isBookmarked;
       }
     },
   },
