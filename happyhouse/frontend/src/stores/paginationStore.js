@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const usePaginationStore = defineStore("pagination", {
   state: () => ({
     currentPageIndex: 1, // 현재 페이지
-    listRowCount: 10, // 한 페이지당 아이템 수
+    listRowCount: 16, // 한 페이지당 아이템 수
     pageLinkCount: 10, // 페이지 번호 버튼 개수
     totalListItemCount: 0, // 전체 아이템 수
   }),
