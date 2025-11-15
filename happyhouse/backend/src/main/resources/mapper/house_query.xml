@@ -5,20 +5,21 @@
 
     <!--  # 지역 코드  -->
     <!--  법정동  -->
-    <select id="getBaseAddress" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.BaseAddressDto">
+    <select id="getBaseAddress" parameterType="long"
+            resultType="com.soaeng.happyhouse.house.dto.response.BaseAddressDto">
         SELECT *
         FROM base_address
         WHERE dong_code = #{dongCode};
     </select>
 
     <!--  시/도  -->
-    <select id="getSidoList" resultType="com.soaeng.happyhouse.house.dto.SidoDto">
+    <select id="getSidoList" resultType="com.soaeng.happyhouse.house.dto.response.SidoDto">
         SELECT sido_code, sido_name
         FROM sido_code;
     </select>
 
     <!--  구/군  -->
-    <select id="getGugunList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.GugunDto">
+    <select id="getGugunList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.GugunDto">
         SELECT gugun_code, gugun_name
         FROM gugun_code
                  JOIN sido_code
@@ -28,7 +29,7 @@
     </select>
 
     <!--  동  -->
-    <select id="getDongList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.DongDto">
+    <select id="getDongList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.DongDto">
         SELECT dong_code, dong_name
         FROM dong_code AS dc
                  JOIN gugun_code AS gc

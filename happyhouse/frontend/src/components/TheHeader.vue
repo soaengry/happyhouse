@@ -9,7 +9,7 @@
         <hr />
         <nav class="global-nav">
           <!-- 메뉴 영역 -->
-          <ul class="menu" :class="{ open: menuOpen || !isMobile }">
+          <ul class="menu">
             <li class="menu-item">
               <router-link to="/" class="text-light">
                 <font-awesome-icon
@@ -116,7 +116,12 @@ function handleProfileClick() {
 }
 
 .menu-item {
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.menu-item a {
   display: flex;
   align-items: center;
 }

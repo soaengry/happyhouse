@@ -1,11 +1,7 @@
 package com.soaeng.happyhouse.house.dao;
 
-import com.soaeng.happyhouse.house.dto.BaseAddressDto;
-import com.soaeng.happyhouse.house.dto.DongDto;
-import com.soaeng.happyhouse.house.dto.GugunDto;
-import com.soaeng.happyhouse.house.dto.SidoDto;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
-import com.soaeng.happyhouse.house.dto.response.HouseDto;
+import com.soaeng.happyhouse.house.dto.response.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

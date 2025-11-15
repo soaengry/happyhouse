@@ -10,111 +10,121 @@
         <button class="close-btn" @click="onClose"></button>
       </div>
       <div class="modal-body">
-        <div class="deal-content">
-          <p class="mb-2">
-            총&nbsp;<span class="text-primary">{{ dealCount }}</span
-            >&nbsp;건
-          </p>
-          <div class="scroll-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>면적(㎡)</th>
-                  <th>층</th>
-                  <th>거래금액</th>
-                  <th>거래일시</th>
-                  <th>관심거래</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="deal in dealList" :key="deal.no">
-                  <td>{{ parseFloat(deal.area).toFixed(1) }}</td>
-                  <td>{{ deal.floor }}</td>
-                  <td>{{ deal.dealAmount }}만 원</td>
-                  <td>
-                    {{
-                      makeDateStr(
-                        deal.dealYear,
-                        deal.dealMonth,
-                        deal.dealDay,
-                        "-",
-                      )
-                    }}
-                  </td>
-                  <td>ㅇ</td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="top-content">
+          <div class="deal-content">
+            <p class="mb-3">
+              총&nbsp;<span class="text-primary">{{ dealCount }}</span
+              >&nbsp;건
+            </p>
+            <div class="scroll-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>면적(㎡)</th>
+                    <th>층</th>
+                    <th>거래금액</th>
+                    <th>거래일시</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="deal in dealList" :key="deal.no">
+                    <td>{{ parseFloat(deal.area).toFixed(1) }}</td>
+                    <td>{{ deal.floor }}</td>
+                    <td>{{ deal.dealAmount }}만 원</td>
+                    <td>
+                      {{
+                        makeDateStr(
+                          deal.dealYear,
+                          deal.dealMonth,
+                          deal.dealDay,
+                          "-",
+                        )
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- end of .scroll-container -->
           </div>
-          <!-- end of .scroll-container -->
+          <!-- end of .deal-content -->
+          <div class="map-content">
+            <div class="btn-box">
+              <button
+                class="apt-btn btn rounded-pill btn-outline-primary"
+                @click="resetMapCenter"
+              >
+                아파트
+              </button>
+              <div class="category">
+                <button
+                  v-for="(category, index) in categories"
+                  :key="category.id"
+                  :id="category.id"
+                  :data-order="index"
+                  :class="[
+                    'category-btn btn rounded-pill',
+                    category.class,
+                    activeCategory === category.id ? 'active' : '',
+                  ]"
+                  @click="(event) => toggleCategory(category.id, event)"
+                >
+                  {{ category.label }}
+                </button>
+              </div>
+            </div>
+            <div id="map"></div>
+          </div>
         </div>
-        <!-- end of .deal-content -->
-        <div class="map-content">
-          <div class="btn-box">
+        <!-- .map-content -->
+        <div class="surrounding-content">
+          <div class="tabs">
             <button
-              class="apt-btn btn rounded-pill btn-outline-primary"
-              @click="resetMapCenter"
+              :class="['tab-btn', activeTab === 'bus' ? 'active' : '']"
+              @click="activeTab = 'bus'"
             >
-              아파트
+              버스정류장
             </button>
-            <div class="category">
-              <button
-                id="SC4"
-                data-order="0"
-                class="category-btn btn rounded-pill btn-outline-success"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                학교
-              </button>
-              <button
-                id="PO3"
-                data-order="1"
-                class="category-btn btn rounded-pill btn-outline-dark"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                공공기관
-              </button>
-              <button
-                id="BK9"
-                data-order="2"
-                class="category-btn btn rounded-pill btn-outline-danger"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                은행
-              </button>
-              <button
-                id="HP8"
-                data-order="3"
-                class="category-btn btn rounded-pill btn-outline-warning"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                병원
-              </button>
-              <button
-                id="CE7"
-                data-order="4"
-                class="category-btn btn rounded-pill btn-outline-secondary"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                카페
-              </button>
-              <button
-                id="CS2"
-                data-order="5"
-                class="category-btn btn rounded-pill btn-outline-info"
-                @click="btnToggle"
-                @mouseup="setCategoryOrder"
-              >
-                편의점
-              </button>
+            <button
+              :class="['tab-btn', activeTab === 'subway' ? 'active' : '']"
+              @click="activeTab = 'subway'"
+            >
+              지하철역
+            </button>
+          </div>
+
+          <div class="tab-content">
+            <div
+              class="bus-content"
+              v-if="activeTab === 'bus' && busStopList.length"
+            >
+              <ul>
+                <li v-for="stop in busStopList" :key="stop.nodeid">
+                  <span class="nodeno">{{ stop.nodeno }}</span>
+                  <span class="nodenm">{{ stop.nodenm }}</span>
+                </li>
+              </ul>
+            </div>
+            <div
+              class="subway-content"
+              v-if="activeTab === 'subway' && subwayStationList.length"
+            >
+              <ul>
+                <li
+                  v-for="station in subwayStationList"
+                  :key="station.stationId"
+                >
+                  <span :class="['route', getRouteClass(station.route)]">{{
+                    station.route
+                  }}</span>
+                  <span class="bldnNm">{{ station.bldnNm }}</span>
+                  <span class="distance"
+                    >{{ Math.round(station.distance) }}m</span
+                  >
+                </li>
+              </ul>
             </div>
           </div>
-          <div id="map"></div>
         </div>
       </div>
       <!-- end of .modal-body -->
@@ -126,7 +136,7 @@
 import { useHouseStore } from "@/stores/houseStore";
 import { makeDateStr } from "@/utils/date";
 import { storeToRefs } from "pinia";
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 
 const props = defineProps({
   house: Object,
@@ -134,7 +144,8 @@ const props = defineProps({
 
 const houseStore = useHouseStore();
 const emit = defineEmits(["close"]);
-const { dealCount, dealList } = storeToRefs(houseStore);
+const { dealCount, dealList, busStopList, subwayStationList } =
+  storeToRefs(houseStore);
 
 const state = reactive({
   map: null,
@@ -146,6 +157,18 @@ const state = reactive({
   order: "",
   places: null,
 });
+
+const activeCategory = ref("");
+const activeTab = ref("bus");
+
+const categories = [
+  { id: "SC4", label: "학교", class: "btn-outline-success" },
+  { id: "PO3", label: "공공기관", class: "btn-outline-dark" },
+  { id: "BK9", label: "은행", class: "btn-outline-danger" },
+  { id: "HP8", label: "병원", class: "btn-outline-warning" },
+  { id: "CE7", label: "카페", class: "btn-outline-secondary" },
+  { id: "CS2", label: "편의점", class: "btn-outline-info" },
+];
 
 const initMap = () => {
   const container = document.getElementById("map"); // 지도를 표시할 div
@@ -195,7 +218,8 @@ const loadScript = () => {
 
 onMounted(async () => {
   await houseStore.getDealList(props.house.aptCode);
-
+  await houseStore.getBusStopList(props.house.lat, props.house.lng);
+  await houseStore.getSubwayStationList(props.house.lat, props.house.lng);
   if (window.kakao && window.kakao.maps) {
     initMap();
   } else {
@@ -207,9 +231,116 @@ function onClose() {
   emit("close");
 }
 
-function resetMapCenter() {
+function toggleCategory(id, event) {
+  if (activeCategory.value === id) {
+    activeCategory.value = "";
+    clearCategoryMarkers(); // 마커 제거
+  } else {
+    activeCategory.value = id;
+    showCategoryPlaces(id); // 마커 표시
+  }
+  event.target.blur();
+}
+
+function getCategoryColor(categoryClass) {
+  return categoryClass.replace("btn-outline-", "");
+}
+
+// 아파트를 중심으로 지도 리셋
+function resetMapCenter(event) {
   if (state.map && state.initCenter) {
     state.map.setCenter(state.initCenter);
+  }
+  event.target.blur(); // 포커스 해제
+}
+
+// 카카오맵 장소 검색 및 마커 표시
+function showCategoryPlaces(categoryCode) {
+  if (!state.map || !window.kakao.maps.services) return;
+
+  const ps = new window.kakao.maps.services.Places(state.map);
+  const center = state.map.getCenter();
+
+  const category = categories.find((c) => c.id === categoryCode);
+  const color = getCategoryColor(category.class);
+  const markerImage = new window.kakao.maps.MarkerImage(
+    `assets/img/markers/marker_${color}.png`,
+    new window.kakao.maps.Size(24, 35),
+  );
+
+  ps.categorySearch(
+    categoryCode,
+    (data, status) => {
+      if (status !== window.kakao.maps.services.Status.OK) return;
+
+      clearCategoryMarkers();
+
+      data.forEach((place) => {
+        const position = new window.kakao.maps.LatLng(place.y, place.x);
+
+        const marker = new window.kakao.maps.Marker({
+          map: state.map,
+          position,
+          image: markerImage,
+        });
+        state.markers.push(marker);
+
+        const overlay = new window.kakao.maps.CustomOverlay({
+          position,
+          content:
+            `<span class="badge rounded-pill bg-` +
+            color +
+            `">` +
+            place.place_name +
+            `</span>`,
+          yAnchor: 3,
+          zIndex: 3,
+        });
+
+        window.kakao.maps.event.addListener(marker, "mouseover", () => {
+          overlay.setMap(state.map);
+        });
+        window.kakao.maps.event.addListener(marker, "mouseout", () => {
+          overlay.setMap(null);
+        });
+        state.infos.push(overlay);
+      });
+    },
+    {
+      location: center,
+      radius: 1000,
+    },
+  );
+}
+
+// 마커 제거 함수
+function clearCategoryMarkers() {
+  state.markers.forEach((marker) => marker.setMap(null));
+  state.infos.forEach((info) => info.setMap(null));
+  state.markers = [];
+  state.infos = [];
+}
+
+function getRouteClass(route) {
+  switch (route) {
+    case "1호선":
+      return "line1";
+    case "2호선":
+      return "line2";
+    case "3호선":
+      return "line3";
+    case "4호선":
+      return "line4";
+    case "5호선":
+      return "line5";
+    case "6호선":
+      return "line6";
+    case "7호선":
+      return "line7";
+    case "8호선":
+      return "line8";
+    default:
+      return "";
   }
 }
 </script>
@@ -232,7 +363,8 @@ function resetMapCenter() {
   background: white;
   border-radius: 0.5rem;
   width: 80%;
-  height: 80vh;
+  min-height: 60vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -291,9 +423,15 @@ function resetMapCenter() {
 
 .modal-body {
   display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.top-content {
+  display: flex;
   grid-area: 1rem;
   flex: 1;
-  overflow-y: auto;
+  margin-bottom: 1rem;
 }
 
 .deal-content {
@@ -343,6 +481,12 @@ function resetMapCenter() {
   margin-left: 0.2rem;
 }
 
+.category-btn.active {
+  background-color: currentColor;
+  color: white;
+  border-color: currentColor;
+}
+
 #map {
   width: 100%;
   height: 400px;
@@ -387,8 +531,78 @@ function resetMapCenter() {
   text-align: center;
 }
 
+.tab-btn {
+  background-color: transparent;
+  color: #4e73df;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px 4px 0 0;
+}
+
+.tab-btn.active {
+  background-color: aliceblue;
+  border-bottom: 2px solid #4e73df;
+}
+
+.tab-content {
+  padding: 1rem;
+}
+
+.bus-content li,
+.subway-content li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.bus-content .nodeno,
+.subway-content .route {
+  margin-right: 0.5rem;
+  color: var(--light);
+  border-radius: 0.5rem;
+  padding: 0rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.bus-content .nodeno {
+  background-color: var(--dark);
+}
+.line1 {
+  background-color: #0052a4;
+} /* 1호선 파랑 */
+.line2 {
+  background-color: #009d3e;
+} /* 2호선 초록 */
+.line3 {
+  background-color: #ef7c1c;
+} /* 3호선 주황 */
+.line4 {
+  background-color: #00a5de;
+} /* 4호선 하늘 */
+.line5 {
+  background-color: #996cac;
+} /* 5호선 보라 */
+.line6 {
+  background-color: #cd7c2f;
+} /* 6호선 갈색 */
+.line7 {
+  background-color: #747f00;
+} /* 7호선 올리브 */
+.line8 {
+  background-color: #e6186c;
+} /* 8호선 분홍 */
+
+.bldnNm {
+  margin-right: 0.5rem;
+}
+
+.distance {
+  font-size: small;
+}
+
 @media (max-width: 992px) {
-  .modal-body {
+  .top-content {
     flex-direction: column;
   }
 

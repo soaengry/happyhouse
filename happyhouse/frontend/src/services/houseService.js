@@ -27,6 +27,14 @@ const houseService = {
   getBookmarks() {
     return fetchData("/bookmark");
   },
+
+  async getBusStopList(params) {
+    return fetchData("/house/busStops", { params });
+  },
+
+  async getSubwayStationList(params) {
+    return fetchData("/house/subwayStations", { params });
+  },
 };
 
 export default houseService;

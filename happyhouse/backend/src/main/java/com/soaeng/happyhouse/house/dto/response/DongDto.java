@@ -1,4 +1,4 @@
-package com.soaeng.happyhouse.house.dto;
+package com.soaeng.happyhouse.house.dto.response;
 
 import lombok.Getter;
 import lombok.ToString;

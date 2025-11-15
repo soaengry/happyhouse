@@ -1,6 +1,5 @@
 package com.soaeng.happyhouse.house.dto.response;
 
-import com.soaeng.happyhouse.house.dto.BaseAddressDto;
 import lombok.Getter;
 import lombok.ToString;
 

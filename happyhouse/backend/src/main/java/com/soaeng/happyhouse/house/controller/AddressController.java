@@ -1,8 +1,8 @@
 package com.soaeng.happyhouse.house.controller;
 
-import com.soaeng.happyhouse.house.dto.DongDto;
-import com.soaeng.happyhouse.house.dto.GugunDto;
-import com.soaeng.happyhouse.house.dto.SidoDto;
+import com.soaeng.happyhouse.house.dto.response.DongDto;
+import com.soaeng.happyhouse.house.dto.response.GugunDto;
+import com.soaeng.happyhouse.house.dto.response.SidoDto;
 import com.soaeng.happyhouse.house.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

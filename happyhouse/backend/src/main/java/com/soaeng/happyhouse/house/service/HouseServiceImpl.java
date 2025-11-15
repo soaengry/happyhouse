@@ -1,12 +1,8 @@
 package com.soaeng.happyhouse.house.service;
 
 import com.soaeng.happyhouse.house.dao.HouseDao;
-import com.soaeng.happyhouse.house.dto.BaseAddressDto;
-import com.soaeng.happyhouse.house.dto.DongDto;
-import com.soaeng.happyhouse.house.dto.GugunDto;
-import com.soaeng.happyhouse.house.dto.SidoDto;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
-import com.soaeng.happyhouse.house.dto.response.HouseDto;
+import com.soaeng.happyhouse.house.dto.response.*;
 import com.soaeng.happyhouse.house.entity.BookmarkHouse;
 import com.soaeng.happyhouse.house.repository.BookmarkHouseRepository;
 import com.soaeng.happyhouse.user.entity.UserEntity;
@@ -179,4 +175,5 @@ public class HouseServiceImpl implements HouseService {
 
         houseDtoList.forEach(houseDto -> houseDto.setBookmark(bookmarkHouseList.contains((long) houseDto.getAptCode())));
     }
+
 }

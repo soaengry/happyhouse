@@ -16,6 +16,8 @@ export const useHouseStore = defineStore("house", {
     isLoading: false,
     bookmarked: false,
     bookmarks: [],
+    busStopList: [], // busStop: {citycode: number, gpslati: string, gpslong: string, nodeid: string, nodenm: string, nodeno: number}
+    subwayStationList: [], // subwayStation: {bldnNm: string, distance: number, route: string}
   }),
 
   actions: {
@@ -106,6 +108,24 @@ export const useHouseStore = defineStore("house", {
       if (target) {
         target.bookmarked = !isBookmarked;
       }
+    },
+
+    async getBusStopList(lat, lng) {
+      const params = {
+        lat,
+        lng,
+      };
+      const busStopList = await houseService.getBusStopList(params);
+      this.busStopList = busStopList;
+    },
+
+    async getSubwayStationList(lat, lng) {
+      const params = {
+        lat,
+        lng,
+      };
+      const subwayStationList = await houseService.getSubwayStationList(params);
+      this.subwayStationList = subwayStationList;
     },
   },
 });

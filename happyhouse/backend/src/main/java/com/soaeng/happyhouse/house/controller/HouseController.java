@@ -1,23 +1,27 @@
 package com.soaeng.happyhouse.house.controller;
 
+import com.soaeng.happyhouse.external.ApiExplorer;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
+import com.soaeng.happyhouse.house.dto.response.BusStopItem;
 import com.soaeng.happyhouse.house.dto.response.HouseDto;
 import com.soaeng.happyhouse.house.dto.response.HouseResponseDto;
+import com.soaeng.happyhouse.house.dto.response.SubwayStationDto;
+import com.soaeng.happyhouse.house.repository.SubwayStationRepository;
 import com.soaeng.happyhouse.house.service.HouseService;
 import com.soaeng.happyhouse.user.entity.UserEntity;
+import com.soaeng.happyhouse.util.GeoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -25,7 +29,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HouseController {
 
+    private final SubwayStationRepository subwayStationRepository;
     private final HouseService service;
+    private final ApiExplorer apiExplorer;
 
     private static final int SUCCESS = 1;
     private static final int FAIL = -1;
@@ -99,6 +105,32 @@ public class HouseController {
         return response.getResult() > 0 ?
                 new ResponseEntity<>(response, HttpStatus.OK) :
                 new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/busStops")
+    public ResponseEntity<List<BusStopItem>> getNearbyBusStops(@RequestParam String lat, @RequestParam String lng) {
+        List<BusStopItem> response = apiExplorer.getNearbyBusStops(lat, lng);
+        log.info(response.toString());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/subwayStations")
+    public ResponseEntity<List<SubwayStationDto>> getNearbySubwayStations(
+            @RequestParam String lat,
+            @RequestParam String lng) {
+
+        // 반경 1km 이내 필터링 - 거리순 정렬
+        List<SubwayStationDto> nearbyStations = subwayStationRepository.findAll().stream()
+                .map(st -> {
+                    double distance = GeoUtil.distance(Double.parseDouble(lat), Double.parseDouble(lng), Double.parseDouble(st.getLat()), Double.parseDouble(st.getLot()));
+                    return new SubwayStationDto(st.getBldnNm(), st.getRoute(), distance);
+                })
+                .filter(dto -> dto.getDistance() <= 1000)
+                .sorted(Comparator.comparingDouble(SubwayStationDto::getDistance))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(nearbyStations);
     }
 
 }
