@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="content-header">
-      <h2 v-if="!isBookmarkMode">매물 검색</h2>
+      <h2 v-if="!isOtherMode">매물 검색</h2>
       <h2 v-else>관심 매물</h2>
     </div>
     <section class="content-body">
       <!-- 검색창 -->
       <fieldset
         class="form-group d-flex align-items-center justify-content-center mb-3 mt-3"
-        v-if="!isBookmarkMode"
+        v-if="!isOtherMode"
       >
         <select class="form-select" v-model="sidoCode" @change="onChangeSido">
           <option value="0">시/도</option>
@@ -98,7 +98,7 @@ import HouseDetailModal from "@/components/HouseDetailModal.vue";
 
 const route = useRoute();
 
-const isBookmarkMode = ref(false);
+const isOtherMode = ref(false);
 const selectedHouse = ref(null);
 const scrollContainer = ref(null);
 let observer;
@@ -121,28 +121,40 @@ watch(
   () => route.fullPath,
   (newPath) => {
     if (newPath === "/bookmark/house") {
-      houseStore.getBookmarkList();
+      isOtherMode.value = true;
+      houseStore.getBookmarkHouseList();
     } else {
+      isOtherMode.value = false;
       houseStore.resetHouseList();
       houseStore.fetchNextPage();
     }
   },
+  { immediate: true }, // 처음에도 실행되도록
 );
 
 onMounted(async () => {
   await addressStore.getSidoList();
   houseStore.loadBookmarks();
 
-  if (route.path === "/bookmark/house") {
-    isBookmarkMode.value = true;
-    await houseStore.getBookmarkList();
+  // 라우트 쿼리 확인
+  if (route.query.sidoCode) {
+    houseStore.sidoCode = Number(route.query.sidoCode);
+    houseStore.gugunCode = Number(route.query.gugunCode);
+    houseStore.dongCode = Number(route.query.dongCode);
+
+    // 해당 지역 매물만 조회
+    houseStore.resetHouseList();
+    await houseStore.fetchNextPage();
+  } else if (route.path === "/bookmark/house") {
+    isOtherMode.value = true;
+    await houseStore.getBookmarkHouseList();
   } else {
     houseStore.resetHouseList();
     houseStore.fetchNextPage();
 
     observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isLoading.value) {
+        if (!isOtherMode.value && entry.isIntersecting && !isLoading.value) {
           houseStore.fetchNextPage();
         }
       },
@@ -196,17 +208,6 @@ function closeModal() {
 </script>
 
 <style scoped>
-.content-header {
-  padding: 1rem 1rem 0 1rem;
-}
-
-.content-body {
-  margin: 1rem;
-  padding: 1rem;
-  background-color: white;
-  border-radius: 1rem;
-}
-
 .scroll-container {
   padding: 1rem 0;
   min-height: 80vh;
@@ -216,11 +217,6 @@ function closeModal() {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* ✅ 2열 */
   gap: 1rem;
-}
-
-select,
-input {
-  margin-right: 0.5rem;
 }
 
 /* 반응형: 모바일에서는 1열 */

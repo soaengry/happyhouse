@@ -1,15 +1,19 @@
 package com.soaeng.happyhouse.house.service;
 
 import com.soaeng.happyhouse.house.dao.HouseDao;
+import com.soaeng.happyhouse.house.dto.response.BaseAddressDto;
 import com.soaeng.happyhouse.house.dto.response.HouseDto;
 import com.soaeng.happyhouse.house.dto.response.HouseResponseDto;
 import com.soaeng.happyhouse.house.entity.BookmarkHouse;
+import com.soaeng.happyhouse.house.entity.BookmarkRegion;
 import com.soaeng.happyhouse.house.repository.BookmarkHouseRepository;
+import com.soaeng.happyhouse.house.repository.BookmarkRegionRepository;
 import com.soaeng.happyhouse.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class BookmarkServiceImpl {
 
     private final BookmarkHouseRepository bookmarkHouseRepository;
+    private final BookmarkRegionRepository bookmarkRegionRepository;
     private final HouseDao houseDao;
 
     @Transactional
@@ -61,6 +66,37 @@ public class BookmarkServiceImpl {
         response.setCount(houseList.size());
 
         return response;
+    }
+
+    @Transactional
+    public boolean addBookmarkRegion(UserEntity user, Long dongCode) {
+        if (bookmarkRegionRepository.findByUserAndDongCode(user, dongCode).isEmpty()) {
+            BookmarkRegion bookmark = BookmarkRegion
+                    .builder()
+                    .user(user)
+                    .dongCode(dongCode).build();
+            return bookmarkRegionRepository.save(bookmark).getId() > 0;
+        }
+        return false;
+    }
+
+    @Transactional
+    public void removeBookmarkRegion(UserEntity user, Long dongCode) {
+        bookmarkRegionRepository.findByUserAndDongCode(user, dongCode)
+                .ifPresent(bookmarkRegionRepository::delete);
+    }
+
+    public List<BaseAddressDto> getBookmarkRegionResponse(UserEntity user) {
+        List<BookmarkRegion> bookmarks = bookmarkRegionRepository.findByUser(user);
+
+        List<Long> dongCodes = bookmarks.stream()
+                .map(BookmarkRegion::getDongCode).toList();
+
+        if (dongCodes.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return houseDao.getBookmarkRegionList(dongCodes);
     }
 
 }

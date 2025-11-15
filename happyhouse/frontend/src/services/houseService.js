@@ -2,6 +2,17 @@ import api from ".";
 import { fetchData } from "./apiHelper";
 
 const houseService = {
+  resetSearch() {
+    this.sidoCode = 0;
+    this.gugunCode = 0;
+    this.dongCode = 0;
+    this.keyword = "";
+    this.houseList = [];
+    this.houseCount = 0;
+    this.currentPage = 1;
+    this.hasMore = true;
+  },
+
   // 매물 리스트 조회
   getHouseList(params) {
     // params: { limit: number, offset: number, sidoCode: number, gugunCode: number, dongCode: number, keyword: string}
@@ -14,18 +25,18 @@ const houseService = {
     return fetchData(`/house/${aptCode}`); // { count: number, houseList: [...], result: number }
   },
 
-  async addBookmark(aptCode) {
-    const { data } = await api.post(`/bookmark/${aptCode}`);
+  async addBookmarkHouse(aptCode) {
+    const { data } = await api.post(`/bookmark/house/${aptCode}`);
     return data;
   },
 
-  async removeBookmark(aptCode) {
-    const { data } = await api.delete(`/bookmark/${aptCode}`);
+  async removeBookmarkHouse(aptCode) {
+    const { data } = await api.delete(`/bookmark/house/${aptCode}`);
     return data;
   },
 
-  getBookmarks() {
-    return fetchData("/bookmark");
+  getBookmarkHouses() {
+    return fetchData("/bookmark/house");
   },
 
   async getBusStopList(params) {

@@ -74,4 +74,6 @@ public interface HouseDao {
 
     List<HouseDto> getBookmarkHouseList(List<Long> aptCodes);
 
+    List<BaseAddressDto> getBookmarkRegionList(List<Long> dongCodes);
+
 }

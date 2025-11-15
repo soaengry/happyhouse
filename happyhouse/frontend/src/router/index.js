@@ -28,7 +28,7 @@ const routes = [
           {
             path: "region",
             name: "BookmarkRegion",
-            component: () => import("@/views/HouseMain.vue"),
+            component: () => import("@/views/BookmarkRegion.vue"),
           },
         ],
       },

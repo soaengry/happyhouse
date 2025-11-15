@@ -496,45 +496,6 @@ function getRouteClass(route) {
   height: 400px;
 }
 
-.deal-content table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.deal-content thead {
-  background-color: #f8f9fc;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.deal-content th {
-  padding: 0.75rem;
-  text-align: center;
-  font-weight: 600;
-  color: #4e73df;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.deal-content td {
-  padding: 0.75rem;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-}
-
-.deal-content tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.deal-content tbody tr:hover {
-  background-color: #e9f2ff;
-}
-
-.deal-content td:last-child {
-  text-align: center;
-}
-
 .tab-btn {
   background-color: transparent;
   color: #4e73df;

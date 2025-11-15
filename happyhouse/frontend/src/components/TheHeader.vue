@@ -2,36 +2,32 @@
   <header>
     <div class="header-container">
       <div class="nav-container">
-        <router-link to="/" class="brand text-light">
+        <a class="brand text-light" @click="onClickSearch">
           <font-awesome-icon class="brand-icon" icon="fa-solid fa-house" />
           <h1 class="brand-name">HAPPY HOUSE</h1>
-        </router-link>
+        </a>
         <hr />
         <nav class="global-nav">
           <!-- 메뉴 영역 -->
           <ul class="menu">
             <li class="menu-item">
-              <router-link to="/" class="text-light">
+              <a class="text-light" @click="onClickSearch">
                 <font-awesome-icon
                   class="menu-icon"
                   icon="fa-solid fa-magnifying-glass"
                 />
-                <span class="menu-name">매물 검색</span>
-              </router-link>
+                <span class="menu-name">매물 검색</span></a
+              >
             </li>
             <li class="menu-item">
               <div class="bookmark-meni">
-                <router-link
-                  to="#"
-                  class="text-light"
-                  @click="bookmarkOpen = !bookmarkOpen"
-                >
+                <a @click="bookmarkOpen = !bookmarkOpen" class="text-light">
                   <font-awesome-icon
                     class="menu-icon"
                     icon="fa-solid fa-bookmark"
                   />
                   <span class="menu-name">북마크</span>
-                </router-link>
+                </a>
                 <transition name="slide-fade">
                   <ul v-if="bookmarkOpen" class="submenu">
                     <li class="submenu-item">
@@ -59,7 +55,7 @@
             </li>
             <li class="menu-item">
               <router-link to="/" class="text-light">
-                <font-awesome-icon class="menu-icon" icon="fa-solid fa-globe" />
+                <font-awesome-icon class="menu-icon" icon="fa-solid fa-users" />
                 <span class="menu-name">커뮤니티</span>
               </router-link>
             </li>
@@ -82,12 +78,14 @@
 </template>
 
 <script setup>
-import { useUserStore } from "@/stores/userStore";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
+import { useHouseStore } from "@/stores/houseStore";
 
-const userStore = useUserStore();
 const router = useRouter();
+const userStore = useUserStore();
+const houseStore = useHouseStore();
 
 const nickname = computed(() => userStore.user?.nickname || "로그인");
 const profileImageUrl = computed(() =>
@@ -114,6 +112,11 @@ function handleProfileClick() {
   } else {
     router.push("/login");
   }
+}
+
+function onClickSearch() {
+  houseStore.resetSearch(); // 지역코드 초기화
+  router.push("/"); // HouseMain.vue로 이동
 }
 </script>
 
@@ -149,7 +152,8 @@ function handleProfileClick() {
 }
 
 .menu-icon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+  margin-right: 0.4rem;
 }
 
 .menu-name {
@@ -177,7 +181,7 @@ function handleProfileClick() {
 }
 
 .submenu-item {
-  margin-top: 0.5rem;
+  margin-top: 0.8rem;
   font-size: small;
 }
 

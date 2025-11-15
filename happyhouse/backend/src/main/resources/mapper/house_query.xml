@@ -358,4 +358,16 @@
         ) hh
         GROUP BY apt_code;
     </select>
+
+    <!--  지역별 즐겨찾기  -->
+    <select id="getBookmarkRegionList" parameterType="list"
+            resultType="com.soaeng.happyhouse.house.dto.response.BaseAddressDto">
+        SELECT sido_name, gugun_name, dong_name, dong_code
+        FROM base_address
+        WHERE dong_code IN
+        <foreach item="dongCode" collection="dongCodes" open="(" separator="," close=")">
+            #{dongCode}
+        </foreach>
+        ORDER BY dong_name
+    </select>
 </mapper>

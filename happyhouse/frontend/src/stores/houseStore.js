@@ -21,6 +21,12 @@ export const useHouseStore = defineStore("house", {
   }),
 
   actions: {
+    resetSearch() {
+      this.sidoCode = 0;
+      this.gugunCode = 0;
+      this.dongCode = 0;
+    },
+
     resetHouseList() {
       this.houseList = [];
       this.houseCount = 0;
@@ -30,13 +36,13 @@ export const useHouseStore = defineStore("house", {
 
     async fetchNextPage() {
       if (!this.hasMore || this.isLoading) return;
-
       this.isLoading = true;
+
       try {
         const params = {
           limit: 16,
           offset: (this.currentPage - 1) * 16,
-          keyword: this.keyword,
+          keyword: this.keyword || "",
           sidoCode: this.sidoCode,
           gugunCode: this.gugunCode,
           dongCode: this.dongCode,
@@ -90,14 +96,14 @@ export const useHouseStore = defineStore("house", {
     },
 
     async loadBookmarks() {
-      const { houseList } = await houseService.getBookmarks();
+      const { houseList } = await houseService.getBookmarkHouses();
       this.bookmarks = houseList.map((h) => h.aptCode);
     },
 
-    async getBookmarkList() {
+    async getBookmarkHouseList() {
       this.isLoading = true;
       try {
-        const { count, houseList } = await houseService.getBookmarks();
+        const { count, houseList } = await houseService.getBookmarkHouses();
         this.houseList = houseList;
         this.houseCount = count;
         this.bookmarks = houseList.map((h) => h.aptCode);
@@ -110,10 +116,10 @@ export const useHouseStore = defineStore("house", {
       const isBookmarked = this.bookmarks.includes(aptCode);
 
       if (isBookmarked) {
-        await houseService.removeBookmark(aptCode);
+        await houseService.removeBookmarkHouse(aptCode);
         this.bookmarks = this.bookmarks.filter((code) => code !== aptCode);
       } else {
-        await houseService.addBookmark(aptCode);
+        await houseService.addBookmarkHouse(aptCode);
         this.bookmarks.push(aptCode);
       }
       const target = this.houseList.find((h) => h.aptCode === aptCode);
