@@ -20,13 +20,33 @@
               </router-link>
             </li>
             <li class="menu-item">
-              <router-link to="/" class="text-light">
-                <font-awesome-icon
-                  class="menu-icon"
-                  icon="fa-solid fa-bookmark"
-                />
-                <span class="menu-name">북마크</span>
-              </router-link>
+              <div class="bookmark-meni">
+                <router-link
+                  to="#"
+                  class="text-light"
+                  @click="bookmarkOpen = !bookmarkOpen"
+                >
+                  <font-awesome-icon
+                    class="menu-icon"
+                    icon="fa-solid fa-bookmark"
+                  />
+                  <span class="menu-name">북마크</span>
+                </router-link>
+                <transition name="slide-fade">
+                  <ul v-if="bookmarkOpen" class="submenu">
+                    <li class="submenu-item">
+                      <router-link to="/bookmark/region" class="text-light"
+                        >관심 지역</router-link
+                      >
+                    </li>
+                    <li class="submenu-item">
+                      <router-link to="/bookmark/house" class="text-light"
+                        >관심 매물</router-link
+                      >
+                    </li>
+                  </ul>
+                </transition>
+              </div>
             </li>
             <li class="menu-item">
               <router-link to="/" class="text-light">
@@ -63,7 +83,7 @@
 
 <script setup>
 import { useUserStore } from "@/stores/userStore";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -74,6 +94,8 @@ const profileImageUrl = computed(() =>
   getProfileImageUrl(userStore.user?.profileImageUrl),
 );
 const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
+
+const bookmarkOpen = ref(false);
 
 onMounted(() => {
   if (!userStore.user && localStorage.getItem("accessToken")) {
@@ -132,6 +154,31 @@ function handleProfileClick() {
 
 .menu-name {
   padding-left: 0.5rem;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.bookmark-menu {
+  display: flex;
+}
+
+.submenu {
+  margin-top: 0.5rem;
+  padding-left: 2.4rem;
+}
+
+.submenu-item {
+  margin-top: 0.5rem;
+  font-size: small;
 }
 
 .profile-container {

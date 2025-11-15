@@ -33,7 +33,7 @@ public class BookmarkController {
     }
 
 
-    @GetMapping("")
+    @GetMapping("/house")
     public ResponseEntity<HouseResponseDto> getBookmarkHouses(@AuthenticationPrincipal UserEntity user) {
         HouseResponseDto response = bookmarkService.getBookmarkHouseResponse(user);
         return new ResponseEntity<>(response, HttpStatus.OK);

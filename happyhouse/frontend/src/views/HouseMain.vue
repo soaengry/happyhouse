@@ -1,12 +1,14 @@
 <template>
   <div>
     <div class="content-header">
-      <h2>매물 검색</h2>
+      <h2 v-if="!isBookmarkMode">매물 검색</h2>
+      <h2 v-else>관심 매물</h2>
     </div>
     <section class="content-body">
       <!-- 검색창 -->
       <fieldset
         class="form-group d-flex align-items-center justify-content-center mb-3 mt-3"
+        v-if="!isBookmarkMode"
       >
         <select class="form-select" v-model="sidoCode" @change="onChangeSido">
           <option value="0">시/도</option>
@@ -58,8 +60,7 @@
       <!-- 검색 결과 -->
       <div class="list-info d-flex">
         <p>
-          총&nbsp;<span class="text-primary">{{ houseCount }}</span
-          >&nbsp;건
+          총&nbsp;<span class="text-primary">{{ houseCount }} </span>&nbsp;건
         </p>
       </div>
 
@@ -86,7 +87,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeUnmount } from "vue";
+import { onMounted, ref, onBeforeUnmount, watch } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useHouseStore } from "@/stores/houseStore";
 import { useAddressStore } from "@/stores/addressStore";
@@ -94,6 +96,9 @@ import { useAddressStore } from "@/stores/addressStore";
 import HouseCard from "@/components/HouseCard.vue";
 import HouseDetailModal from "@/components/HouseDetailModal.vue";
 
+const route = useRoute();
+
+const isBookmarkMode = ref(false);
 const selectedHouse = ref(null);
 const scrollContainer = ref(null);
 let observer;
@@ -112,24 +117,42 @@ const {
 } = storeToRefs(houseStore);
 const { sidoList, gugunList, dongList } = storeToRefs(addressStore);
 
+watch(
+  () => route.fullPath,
+  (newPath) => {
+    if (newPath === "/bookmark/house") {
+      houseStore.getBookmarkList();
+    } else {
+      houseStore.resetHouseList();
+      houseStore.fetchNextPage();
+    }
+  },
+);
+
 onMounted(async () => {
   await addressStore.getSidoList();
-  houseStore.resetHouseList();
-  houseStore.fetchNextPage();
   houseStore.loadBookmarks();
-  observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting && !isLoading.value) {
-        houseStore.fetchNextPage();
-      }
-    },
-    { threshold: 1.0 },
-  );
 
-  const sentinel = document.createElement("div");
-  sentinel.id = "scroll-sentinel";
-  scrollContainer.value.appendChild(sentinel);
-  observer.observe(sentinel);
+  if (route.path === "/bookmark/house") {
+    isBookmarkMode.value = true;
+    await houseStore.getBookmarkList();
+  } else {
+    houseStore.resetHouseList();
+    houseStore.fetchNextPage();
+
+    observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isLoading.value) {
+          houseStore.fetchNextPage();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    const sentinel = document.createElement("div");
+    scrollContainer.value.appendChild(sentinel);
+    observer.observe(sentinel);
+  }
 });
 
 onBeforeUnmount(() => {

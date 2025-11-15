@@ -94,17 +94,15 @@
           </div>
 
           <div class="tab-content">
-            <div
-              class="bus-content"
-              v-if="activeTab === 'bus' && busStopList.length"
-            >
-              <ul>
+            <div class="bus-content">
+              <ul v-if="activeTab === 'bus' && busStopList.length">
                 <li v-for="stop in busStopList" :key="stop.nodeid">
                   <span class="nodeno">{{ stop.nodeno }}</span>
                   <span class="nodenm">{{ stop.nodenm }}</span>
                 </li>
               </ul>
             </div>
+            <!-- end of .bus-content -->
             <div
               class="subway-content"
               v-if="activeTab === 'subway' && subwayStationList.length"
@@ -123,9 +121,15 @@
                   >
                 </li>
               </ul>
+              <p v-if="subwayStationList.length === 0">
+                반경 1km내 지하철역이 존재하지 않습니다.
+              </p>
             </div>
+            <!-- end of .subway-content -->
           </div>
+          <!-- end of .tab-content -->
         </div>
+        <!-- end of .surrounding-content -->
       </div>
       <!-- end of .modal-body -->
     </div>
@@ -198,7 +202,7 @@ const initMap = () => {
   const marker = new window.kakao.maps.Marker({
     position: new window.kakao.maps.LatLng(props.house.lat, props.house.lng),
     image: new window.kakao.maps.MarkerImage(
-      "assets/img/markers/marker_primary.png",
+      "/assets/img/markers/marker_primary.png",
       new window.kakao.maps.Size(24, 35),
     ),
   });
@@ -264,7 +268,7 @@ function showCategoryPlaces(categoryCode) {
   const category = categories.find((c) => c.id === categoryCode);
   const color = getCategoryColor(category.class);
   const markerImage = new window.kakao.maps.MarkerImage(
-    `assets/img/markers/marker_${color}.png`,
+    `/assets/img/markers/marker_${color}.png`,
     new window.kakao.maps.Size(24, 35),
   );
 

@@ -17,6 +17,21 @@ const routes = [
         name: "UserInfoView",
         component: () => import("@/views/UserInfoView.vue"),
       },
+      {
+        path: "bookmark",
+        children: [
+          {
+            path: "house",
+            name: "Bookmark",
+            component: () => import("@/views/HouseMain.vue"),
+          },
+          {
+            path: "region",
+            name: "BookmarkRegion",
+            component: () => import("@/views/HouseMain.vue"),
+          },
+        ],
+      },
     ],
   },
   {

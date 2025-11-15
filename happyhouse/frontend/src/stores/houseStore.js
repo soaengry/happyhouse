@@ -94,6 +94,18 @@ export const useHouseStore = defineStore("house", {
       this.bookmarks = houseList.map((h) => h.aptCode);
     },
 
+    async getBookmarkList() {
+      this.isLoading = true;
+      try {
+        const { count, houseList } = await houseService.getBookmarks();
+        this.houseList = houseList;
+        this.houseCount = count;
+        this.bookmarks = houseList.map((h) => h.aptCode);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     async toggleBookmark(aptCode) {
       const isBookmarked = this.bookmarks.includes(aptCode);
 
