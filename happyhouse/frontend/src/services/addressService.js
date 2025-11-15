@@ -1,3 +1,4 @@
+import api from ".";
 import { fetchData } from "./apiHelper";
 
 const addressService = {
@@ -9,6 +10,19 @@ const addressService = {
   },
   getDongList(gugunCode) {
     return fetchData(`/dong/${gugunCode}`);
+  },
+  async addBookmarkRegion(dongCode) {
+    const { data } = await api.post(`/bookmark/region/${dongCode}`);
+    return data;
+  },
+
+  async removeBookmarkRegion(dongCode) {
+    const { data } = await api.delete(`/bookmark/region/${dongCode}`);
+    return data;
+  },
+
+  getBookmarkRegions() {
+    return fetchData("/bookmark/region");
   },
 };
 

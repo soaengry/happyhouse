@@ -6,6 +6,7 @@ export const useAddressStore = defineStore("address", {
     sidoList: [],
     gugunList: [],
     dongList: [],
+    bookmarkRegionList: [],
   }),
   actions: {
     async getSidoList() {
@@ -23,6 +24,11 @@ export const useAddressStore = defineStore("address", {
     },
     resetDong() {
       this.dongList = [];
+    },
+    async getBookmarkRegionList(dongCode) {
+      this.bookmarkRegionList = await addressService.getBookmarkRegions(
+        dongCode,
+      );
     },
   },
 });
