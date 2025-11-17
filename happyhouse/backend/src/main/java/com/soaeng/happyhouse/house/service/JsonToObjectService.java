@@ -15,11 +15,11 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SubwayStationService {
+public class JsonToObjectService {
 
     private final SubwayStationRepository repository;
 
-    public void importFromJsonFile(String filePath) {
+    public void mapSubwayStation(String filePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(new File(filePath));
