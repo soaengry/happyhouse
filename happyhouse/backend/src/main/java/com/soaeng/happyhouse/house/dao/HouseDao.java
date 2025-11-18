@@ -25,6 +25,8 @@ public interface HouseDao {
 
     String getAdstrdCode(Long dongCode);
 
+    Long getGugunCode(Long dongCode);
+
     /* 매물별 최근 거래 목록 */
     // 전체
     List<HouseDto> getAllHouseList(HouseParamDto param);

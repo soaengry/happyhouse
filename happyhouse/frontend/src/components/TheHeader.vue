@@ -45,7 +45,7 @@
               </div>
             </li>
             <li class="menu-item">
-              <router-link to="/" class="text-light">
+              <router-link to="/news" class="text-light">
                 <font-awesome-icon
                   class="menu-icon"
                   icon="fa-solid fa-newspaper"

@@ -44,6 +44,14 @@
         WHERE dong_code = #{dongCode}
     </select>
 
+    <select id="getGugunCode" parameterType="long" resultType="long">
+        SELECT gugun_code
+        FROM gugun_code
+        WHERE gugun_name = (SELECT gugun_name
+                            FROM dong_code
+                            WHERE dong_code = #{dongCode});
+    </select>
+
     <!--  # 매물별 최근 거래 목록 -->
     <!--  전체  -->
     <select id="getAllHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"

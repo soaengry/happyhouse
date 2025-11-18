@@ -36,6 +36,9 @@ dependencies {
     // Tika
     implementation 'org.apache.tika:tika-core:3.0.0'
 
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.21.1'
+
     // Selenium
     implementation 'org.seleniumhq.selenium:selenium-java:4.34.0'
 

@@ -104,6 +104,35 @@
           </div>
         </div>
       </div>
+      <!-- end of .population-content -->
+      <div v-if="isLoading" class="loading">
+        <span>불러오는 중...</span>
+      </div>
+      <div class="news-container" v-else-if="selectedRow !== null">
+        <div v-for="news in newsList" :key="news.url" class="card news-card">
+          <div class="img-box">
+            <img
+              v-if="news.img"
+              :src="news.img"
+              class="card-img-left"
+              alt="뉴스 이미지"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">
+              <a :href="news.url" target="_blank">{{ news.title }}</a>
+            </h5>
+            <p class="card-text">{{ news.content }}</p>
+            <div class="card-footer">
+              <small class="text-muted"
+                >{{ news.publish }} | {{ news.date }}</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- end of .news-container -->
     </section>
   </div>
 </template>
@@ -124,8 +153,11 @@ const addressStore = useAddressStore();
 
 const { sidoList, gugunList, dongList, bookmarkRegionList } =
   storeToRefs(addressStore);
-const { sidoCode, gugunCode, dongCode, population } = storeToRefs(houseStore);
+const { sidoCode, gugunCode, dongCode, population, newsList } =
+  storeToRefs(houseStore);
+
 const selectedRow = ref(null);
+const isLoading = ref(false);
 
 // 차트 인스턴스 저장 (중복 생성 방지)
 let barChartInstance, maleDonutInstance, femaleDonutInstance;
@@ -187,7 +219,10 @@ async function searchRegion(region) {
 
 async function drawChart(dongCode) {
   await houseStore.getPopulation(dongCode);
-  console.log(selectedRow);
+  isLoading.value = true;
+  await houseStore.getNews(dongCode);
+  isLoading.value = false;
+
   // 기존 차트 제거
   if (barChartInstance) barChartInstance.destroy();
   if (maleDonutInstance) maleDonutInstance.destroy();
@@ -281,7 +316,7 @@ async function drawChart(dongCode) {
 
 <style scoped>
 .bookmark-table {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 table tbody tr.selected {
@@ -297,7 +332,7 @@ td {
   display: flex;
   justify-content: space-between;
   width: 90%;
-  margin: 0 auto;
+  margin: 0 auto 3rem auto;
 }
 
 .population-content div {
@@ -306,6 +341,32 @@ td {
 
 .gender-chart {
   display: flex;
+}
+
+.news-card {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
+}
+
+.card-img-left {
+  height: 150px;
+  width: 200px;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.card-footer {
+  margin-top: 1rem;
+  background-color: transparent;
+  text-align: end;
+  padding: 1rem 0 0 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
 }
 
 @media (max-width: 768px) {

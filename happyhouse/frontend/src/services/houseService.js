@@ -50,6 +50,10 @@ const houseService = {
   async getPopulation(dongCode) {
     return fetchData(`/house/population/${dongCode}`);
   },
+
+  async getNews(params) {
+    return fetchData(`/house/news`, { params });
+  },
 };
 
 export default houseService;

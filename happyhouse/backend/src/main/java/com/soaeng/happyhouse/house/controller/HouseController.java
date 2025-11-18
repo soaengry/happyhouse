@@ -5,6 +5,8 @@ import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
 import com.soaeng.happyhouse.house.dto.response.*;
 import com.soaeng.happyhouse.house.repository.SubwayStationRepository;
 import com.soaeng.happyhouse.house.service.HouseService;
+import com.soaeng.happyhouse.house.service.JsoupCrawler;
+import com.soaeng.happyhouse.house.service.SeleniumCrawler;
 import com.soaeng.happyhouse.user.entity.UserEntity;
 import com.soaeng.happyhouse.util.GeoUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,8 @@ public class HouseController {
     private final SubwayStationRepository subwayStationRepository;
     private final HouseService service;
     private final ApiExplorer apiExplorer;
-
+    private final SeleniumCrawler seleniumCrawler;
+    private final JsoupCrawler jsoupCrawler;
     private static final int SUCCESS = 1;
     private static final int FAIL = -1;
 
@@ -134,7 +137,18 @@ public class HouseController {
     public ResponseEntity<PopulationDto> getPopulation(@PathVariable Long dongCode) {
         PopulationDto dto = service.getPopulation(dongCode);
         log.info(dto.toString());
+
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/news")
+    public ResponseEntity<List<NewsDto>> getNews(@RequestParam Long dongCode) {
+        List<NewsDto> newsDtoList = jsoupCrawler.crawlNews(dongCode);
+
+        return newsDtoList != null ?
+                new ResponseEntity<>(newsDtoList, HttpStatus.OK) :
+                new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
 }

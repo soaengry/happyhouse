@@ -32,6 +32,11 @@ const routes = [
           },
         ],
       },
+      {
+        path: "news",
+        name: "News",
+        component: () => import("@/views/NewsView.vue"),
+      },
     ],
   },
   {
