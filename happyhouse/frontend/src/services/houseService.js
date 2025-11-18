@@ -46,6 +46,10 @@ const houseService = {
   async getSubwayStationList(params) {
     return fetchData("/house/subwayStations", { params });
   },
+
+  async getPopulation(dongCode) {
+    return fetchData(`/house/population/${dongCode}`);
+  },
 };
 
 export default houseService;

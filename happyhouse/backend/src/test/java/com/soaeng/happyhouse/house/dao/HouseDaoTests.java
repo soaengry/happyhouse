@@ -20,7 +20,7 @@ public class HouseDaoTests {
     final long dongCode = 1111011500;
     final String dongName = "사직동";
     final String keyword = "풍림";
-    final int aptCode = 1;
+    final long aptCode = 1;
 
     @Autowired
     private HouseDao dao;

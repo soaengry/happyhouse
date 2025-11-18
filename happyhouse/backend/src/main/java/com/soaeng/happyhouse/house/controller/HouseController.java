@@ -2,10 +2,7 @@ package com.soaeng.happyhouse.house.controller;
 
 import com.soaeng.happyhouse.external.ApiExplorer;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
-import com.soaeng.happyhouse.house.dto.response.BusStopItem;
-import com.soaeng.happyhouse.house.dto.response.HouseDto;
-import com.soaeng.happyhouse.house.dto.response.HouseResponseDto;
-import com.soaeng.happyhouse.house.dto.response.SubwayStationDto;
+import com.soaeng.happyhouse.house.dto.response.*;
 import com.soaeng.happyhouse.house.repository.SubwayStationRepository;
 import com.soaeng.happyhouse.house.service.HouseService;
 import com.soaeng.happyhouse.user.entity.UserEntity;
@@ -95,7 +92,7 @@ public class HouseController {
     }
 
     @GetMapping("/{aptCode}")
-    public ResponseEntity<HouseResponseDto> getHouseDealList(@PathVariable Integer aptCode) {
+    public ResponseEntity<HouseResponseDto> getHouseDealList(@PathVariable Long aptCode) {
         HouseResponseDto response = new HouseResponseDto();
 
         response.setHouseList(service.getHouseDealList(aptCode));
@@ -131,6 +128,13 @@ public class HouseController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(nearbyStations);
+    }
+
+    @GetMapping("/population/{dongCode}")
+    public ResponseEntity<PopulationDto> getPopulation(@PathVariable Long dongCode) {
+        PopulationDto dto = service.getPopulation(dongCode);
+        log.info(dto.toString());
+        return ResponseEntity.ok(dto);
     }
 
 }

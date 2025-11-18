@@ -67,8 +67,10 @@ public interface HouseService {
 
     /* 거래 상세 */
     // 매물별 거래 상세 목록
-    List<HouseDto> getHouseDealList(Integer aptCode);
+    List<HouseDto> getHouseDealList(Long aptCode);
 
-    int getHouseDealCount(Integer aptCode);
+    int getHouseDealCount(Long aptCode);
+
+    PopulationDto getPopulation(Long dongCode);
 
 }

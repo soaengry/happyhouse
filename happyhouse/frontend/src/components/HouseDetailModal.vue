@@ -91,6 +91,12 @@
             >
               지하철역
             </button>
+            <button
+              :class="['tab-btn', activeTab === 'population' ? 'active' : '']"
+              @click="activeTab = 'population'"
+            >
+              생활 인구 정보
+            </button>
           </div>
 
           <div class="tab-content">
@@ -121,9 +127,6 @@
                   >
                 </li>
               </ul>
-              <p v-if="subwayStationList.length === 0">
-                반경 1km내 지하철역이 존재하지 않습니다.
-              </p>
             </div>
             <!-- end of .subway-content -->
           </div>
@@ -137,10 +140,13 @@
 </template>
 
 <script setup>
+import { onMounted, reactive, ref } from "vue";
+import { storeToRefs } from "pinia";
 import { useHouseStore } from "@/stores/houseStore";
 import { makeDateStr } from "@/utils/date";
-import { storeToRefs } from "pinia";
-import { onMounted, reactive, ref } from "vue";
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
 
 const props = defineProps({
   house: Object,

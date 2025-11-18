@@ -48,7 +48,7 @@
       </form>
       <!-- end of form-group -->
       <!-- 관심지역 테이블 -->
-      <table>
+      <table class="bookmark-table">
         <thead>
           <tr>
             <th>시/도</th>
@@ -59,7 +59,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="region in bookmarkRegionList" :key="region.dongCode">
+          <tr
+            v-for="region in bookmarkRegionList"
+            :key="region.dongCode"
+            @click="
+              [drawChart(region.dongCode), (selectedRow = region.dongCode)]
+            "
+            :class="{ selected: selectedRow === region.dongCode }"
+          >
             <td>{{ region.sidoName }}</td>
             <td>{{ region.gugunName }}</td>
             <td>{{ region.dongName }}</td>
@@ -79,23 +86,33 @@
           </tr>
         </tbody>
       </table>
+      <div class="population-content">
+        <!-- 지역별 생활 인구 수 Bar Chart -->
+        <div>
+          <canvas id="total-bar"></canvas>
+        </div>
+        <!-- 성별/나이 생활 인구 구분 Donut Chart -->
+        <div class="gender-chart">
+          <div>
+            <canvas id="male-donut"></canvas>
+          </div>
+          <div>
+            <canvas id="female-donut"></canvas>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
-
-  <HouseDetailModal
-    v-if="selectedHouse"
-    :house="selectedHouse"
-    @close="closeModal"
-  />
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useHouseStore } from "@/stores/houseStore";
 import { useAddressStore } from "@/stores/addressStore";
 import addressService from "@/services/addressService";
+import Chart from "chart.js/auto";
 
 const router = useRouter();
 
@@ -104,12 +121,17 @@ const addressStore = useAddressStore();
 
 const { sidoList, gugunList, dongList, bookmarkRegionList } =
   storeToRefs(addressStore);
-const { sidoCode, gugunCode, dongCode } = storeToRefs(houseStore);
+const { sidoCode, gugunCode, dongCode, population } = storeToRefs(houseStore);
+const selectedRow = ref(null);
+
+// 차트 인스턴스 저장 (중복 생성 방지)
+let barChartInstance, maleDonutInstance, femaleDonutInstance;
 
 onMounted(async () => {
   await addressStore.getSidoList();
   await loadRegions();
 });
+
 // 시/도 선택필드 변경 시
 function onChangeSido() {
   // 구/군, 동 코드 초기화
@@ -159,11 +181,140 @@ async function searchRegion(region) {
     },
   });
 }
+
+async function drawChart(dongCode) {
+  await houseStore.getPopulation(dongCode);
+  console.log(selectedRow);
+  // 기존 차트 제거
+  if (barChartInstance) barChartInstance.destroy();
+  if (maleDonutInstance) maleDonutInstance.destroy();
+  if (femaleDonutInstance) femaleDonutInstance.destroy();
+
+  // Bar Chart
+  barChartInstance = new Chart(document.getElementById("total-bar"), {
+    type: "bar",
+    data: {
+      labels: ["총 인구", "남성 인구", "여성 인구"],
+      datasets: [
+        {
+          label: "생활 인구 수",
+          data: [
+            Math.round(population.value.totalLocal),
+            Math.round(population.value.totalMale),
+            Math.round(population.value.totalFemale),
+          ],
+          backgroundColor: ["#36A2EB", "#4BC0C0", "#FF6384"],
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "지역별 생활 인구 수",
+        },
+      },
+    },
+  });
+
+  // Male Donut Chart
+  maleDonutInstance = new Chart(document.getElementById("male-donut"), {
+    type: "doughnut",
+    data: {
+      labels: ["0~19세", "20~39세", "40~59세", "60~74세"],
+      datasets: [
+        {
+          data: [
+            Math.round(population.value.maleTo19),
+            Math.round(population.value.maleTo39),
+            Math.round(population.value.maleTo59),
+            Math.round(population.value.maleTo74),
+          ],
+          backgroundColor: ["#36A2EB", "#4BC0C0", "#FFCE56", "#9966FF"],
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "남성 연령별 생활 인구",
+        },
+      },
+    },
+  });
+
+  // Female Donut Chart
+  femaleDonutInstance = new Chart(document.getElementById("female-donut"), {
+    type: "doughnut",
+    data: {
+      labels: ["0~19세", "20~39세", "40~59세", "60~74세"],
+      datasets: [
+        {
+          data: [
+            Math.round(population.value.femaleTo19),
+            Math.round(population.value.femaleTo39),
+            Math.round(population.value.femaleTo59),
+            Math.round(population.value.femaleTo74),
+          ],
+          backgroundColor: ["#FF6384", "#FF9F40", "#FFCD56", "#C9CBCF"],
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "여성 연령별 생활 인구",
+        },
+      },
+    },
+  });
+}
 </script>
 
 <style scoped>
+.bookmark-table {
+  margin-bottom: 1rem;
+}
+
+table tbody tr.selected {
+  background-color: #e9f2ff; /* hover와 동일한 색상 */
+}
+
 td {
   padding: 0;
   vertical-align: middle;
+}
+
+.population-content {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.population-content div {
+  width: 45%;
+}
+
+.gender-chart {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .population-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .population-content div {
+    width: 100%;
+    height: 200px;
+    margin-top: 1rem;
+  }
 }
 </style>

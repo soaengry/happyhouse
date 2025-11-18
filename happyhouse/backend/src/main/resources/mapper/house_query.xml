@@ -38,6 +38,11 @@
         ORDER BY dong_name;
     </select>
 
+    <select id="getAdstrdCode" parameterType="long" resultType="string">
+        SELECT adstrd_code
+        FROM dong_code
+        WHERE dong_code = #{dongCode}
+    </select>
 
     <!--  # 매물별 최근 거래 목록 -->
     <!--  전체  -->
@@ -302,7 +307,7 @@
 
     <!--  # 거래 목록  -->
     <!--  아파트별 거래 상세 목록  -->
-    <select id="getHouseDealList" parameterType="int" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+    <select id="getHouseDealList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
         SELECT hd.no,
                hi.apt_code,
                hi.apt_name,
@@ -324,7 +329,7 @@
     </select>
 
     <!--  아파트별 거래 수  -->
-    <select id="getHouseDealCount" parameterType="int" resultType="int">
+    <select id="getHouseDealCount" parameterType="long" resultType="int">
         SELECT count(*)
         FROM house_deal
         WHERE apt_code = #{aptCode};
@@ -369,5 +374,13 @@
             #{dongCode}
         </foreach>
         ORDER BY dong_name
+    </select>
+
+    <!--  지역별 인구 통계  -->
+    <select id="getPopulation" parameterType="string"
+            resultType="com.soaeng.happyhouse.house.dto.response.PopulationDto">
+        SELECT *
+        FROM population
+        WHERE adstrd_code = #{adstrdCode}
     </select>
 </mapper>

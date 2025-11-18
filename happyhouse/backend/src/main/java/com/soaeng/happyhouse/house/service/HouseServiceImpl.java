@@ -1,5 +1,6 @@
 package com.soaeng.happyhouse.house.service;
 
+import com.soaeng.happyhouse.external.ApiExplorer;
 import com.soaeng.happyhouse.house.dao.HouseDao;
 import com.soaeng.happyhouse.house.dto.request.HouseParamDto;
 import com.soaeng.happyhouse.house.dto.response.*;
@@ -20,6 +21,7 @@ public class HouseServiceImpl implements HouseService {
 
     private final HouseDao houseDao;
     private final BookmarkHouseRepository bookmarkHouseRepository;
+    private final ApiExplorer apiExplorer;
 
     @Override
     public BaseAddressDto getBaseAddress(Long dongCode) {
@@ -154,13 +156,26 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public List<HouseDto> getHouseDealList(Integer aptCode) {
+    public List<HouseDto> getHouseDealList(Long aptCode) {
         return houseDao.getHouseDealList(aptCode);
     }
 
     @Override
-    public int getHouseDealCount(Integer aptCode) {
+    public int getHouseDealCount(Long aptCode) {
         return houseDao.getHouseDealCount(aptCode);
+    }
+
+    @Override
+    public PopulationDto getPopulation(Long dongCode) {
+        String adstrdCode = houseDao.getAdstrdCode(dongCode);
+        if (adstrdCode == null) return null;
+
+        PopulationDto populationDto = houseDao.getPopulation(adstrdCode);
+        if (populationDto != null) {
+            return populationDto;
+        }
+
+        return apiExplorer.getPopulation(adstrdCode);
     }
 
     private void setBaseAddressList(List<HouseDto> houseDtoList) {

@@ -36,6 +36,12 @@ dependencies {
     // Tika
     implementation 'org.apache.tika:tika-core:3.0.0'
 
+    // Selenium
+    implementation 'org.seleniumhq.selenium:selenium-java:4.34.0'
+
+    // WebDriverManager
+    implementation 'io.github.bonigarcia:webdrivermanager:6.1.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'

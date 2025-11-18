@@ -23,6 +23,7 @@ public interface HouseDao {
     // 동
     List<DongDto> getDongList(Long gugunCode);
 
+    String getAdstrdCode(Long dongCode);
 
     /* 매물별 최근 거래 목록 */
     // 전체
@@ -68,12 +69,14 @@ public interface HouseDao {
 
     /* 거래 상세 */
     // 매물별 거래 상세 목록
-    List<HouseDto> getHouseDealList(Integer aptCode);
+    List<HouseDto> getHouseDealList(Long aptCode);
 
-    int getHouseDealCount(Integer aptCode);
+    int getHouseDealCount(Long aptCode);
 
     List<HouseDto> getBookmarkHouseList(List<Long> aptCodes);
 
     List<BaseAddressDto> getBookmarkRegionList(List<Long> dongCodes);
+
+    PopulationDto getPopulation(String adstrdCode);
 
 }
