@@ -53,12 +53,6 @@
                 <span class="menu-name">주요 뉴스</span>
               </router-link>
             </li>
-            <li class="menu-item">
-              <router-link to="/" class="text-light">
-                <font-awesome-icon class="menu-icon" icon="fa-solid fa-users" />
-                <span class="menu-name">커뮤니티</span>
-              </router-link>
-            </li>
           </ul>
         </nav>
       </div>
