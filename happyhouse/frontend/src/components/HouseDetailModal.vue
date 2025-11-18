@@ -91,12 +91,6 @@
             >
               지하철역
             </button>
-            <button
-              :class="['tab-btn', activeTab === 'population' ? 'active' : '']"
-              @click="activeTab = 'population'"
-            >
-              생활 인구 정보
-            </button>
           </div>
 
           <div class="tab-content">
