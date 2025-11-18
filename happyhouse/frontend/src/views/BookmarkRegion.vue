@@ -71,14 +71,17 @@
             <td>{{ region.gugunName }}</td>
             <td>{{ region.dongName }}</td>
             <td>
-              <button class="btn text-primary" @click="searchRegion(region)">
+              <button
+                class="btn text-primary"
+                @click.stop="searchRegion(region)"
+              >
                 <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
               </button>
             </td>
             <td>
               <button
                 class="btn text-danger"
-                @click="removeRegion(region.dongCode)"
+                @click.stop="removeRegion(region.dongCode)"
               >
                 <font-awesome-icon icon="fa-solid fa-xmark" />
               </button>
