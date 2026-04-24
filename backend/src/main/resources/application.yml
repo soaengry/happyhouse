@@ -1,0 +1,48 @@
+spring:
+  profiles:
+    include: env, oauth
+    active: local
+
+  application:
+    name: happyhouse
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/happyhouse_data?&serverTimezone=Asia/Seoul
+
+  jpa:
+    generate-ddl: true
+    database: mysql
+    # 운영 환경에서는 validate 또는 none으로 변경 필요
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+server:
+  servlet:
+    context-path: /api
+
+# MyBatis
+mybatis:
+  config-location: classpath:/config/mybatis-config.xml
+
+app:
+  path:
+    upload: upload
+  front-url: http://localhost:3000
+  cookie:
+    secure: false
+
+jwt:
+  access-ttl: 3600      # 1h (초)
+  refresh-ttl: 604800   # 7d (초)

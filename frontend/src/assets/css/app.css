@@ -1,0 +1,292 @@
+@import "./reset.css";
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --primary:     #2563EB;
+  --primary-50:  #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-700: #1D4ED8;
+
+  --sidebar-bg:          #0F172A;
+  --sidebar-hover:       rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg:   rgba(37, 99, 235, 0.15);
+  --sidebar-text:        #94A3B8;
+  --sidebar-text-active: #F8FAFC;
+
+  --bg:      #F1F5F9;
+  --bg-card: #FFFFFF;
+  --border:  #E2E8F0;
+
+  --text:           #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
+
+  --success: #10B981;
+  --danger:  #EF4444;
+  --warning: #F59E0B;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow:    0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.07), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 20px 30px rgba(0, 0, 0, 0.08), 0 8px 12px rgba(0, 0, 0, 0.04);
+
+  --radius-sm: 0.375rem;
+  --radius:    0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+
+  /* bootstrap compat */
+  --light: #F8FAFC;
+  --dark:  #0F172A;
+  --gray:  #94A3B8;
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; cursor: pointer; }
+button { cursor: pointer; font-family: inherit; }
+ul { list-style: none; }
+
+/* ── Full-screen centering wrapper ────────────────────── */
+#wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Page Layout ───────────────────────────────────────── */
+.content-header {
+  padding: 1.75rem 1.5rem 0;
+}
+.content-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.content-header p {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.content-body {
+  margin: 1rem 1.5rem 1.5rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Form Inputs ───────────────────────────────────────── */
+input, select {
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  margin-right: 0.5rem;
+}
+input { width: 100%; }
+select { cursor: pointer; }
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+input[readonly] {
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: default;
+}
+input::placeholder { color: var(--text-muted); }
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 2.5rem;
+  padding: 0 1.125rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-700); }
+
+.btn-outline-primary {
+  background: transparent;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+}
+.btn-outline-primary:hover { background: var(--primary-50); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0 0.5rem;
+}
+.btn-ghost:hover { background: var(--bg); }
+
+/* ── Typography Helpers ────────────────────────────────── */
+.text-primary   { color: var(--primary) !important; }
+.text-danger    { color: var(--danger) !important; }
+.text-muted     { color: var(--text-muted) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.fw-bold        { font-weight: 700; }
+.small          { font-size: 0.8rem; }
+
+/* ── Table ─────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+thead {
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+th {
+  padding: 0.65rem 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: var(--primary-50); }
+
+/* ── Badge ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-primary { background: var(--primary-100); color: var(--primary-700); }
+
+/* ── CKEditor Content Styles ───────────────────────────────
+   reset.css가 모든 기본 스타일을 제거하므로
+   에디터(.ck-editor__editable)와 상세보기(.ck-content) 모두
+   여기서 서식 스타일을 복원한다.
+─────────────────────────────────────────────────────────── */
+.ck-editor__editable,
+.ck-content {
+  line-height: 1.75;
+  color: var(--text);
+}
+
+/* Headings */
+.ck-editor__editable h1, .ck-content h1 { font-size: 2em;    font-weight: 700; margin: 0.75rem 0 0.4rem; }
+.ck-editor__editable h2, .ck-content h2 { font-size: 1.5em;  font-weight: 700; margin: 0.75rem 0 0.4rem; }
+.ck-editor__editable h3, .ck-content h3 { font-size: 1.17em; font-weight: 700; margin: 0.75rem 0 0.4rem; }
+.ck-editor__editable h4, .ck-content h4 { font-size: 1em;    font-weight: 700; margin: 0.75rem 0 0.4rem; }
+
+/* Inline */
+.ck-editor__editable strong, .ck-content strong { font-weight: 700; }
+.ck-editor__editable em,     .ck-content em     { font-style: italic; }
+.ck-editor__editable u,      .ck-content u      { text-decoration: underline; }
+.ck-editor__editable s,      .ck-content s      { text-decoration: line-through; }
+
+/* Paragraph */
+.ck-editor__editable p, .ck-content p { margin-bottom: 0.6rem; }
+
+/* Lists */
+.ck-editor__editable ul, .ck-content ul { list-style-type: disc;    padding-left: 2em; margin: 0.4rem 0 0.6rem; }
+.ck-editor__editable ol, .ck-content ol { list-style-type: decimal; padding-left: 2em; margin: 0.4rem 0 0.6rem; }
+.ck-editor__editable li, .ck-content li { list-style: inherit; margin-bottom: 0.2rem; }
+
+/* Blockquote */
+.ck-editor__editable blockquote,
+.ck-content blockquote {
+  border-left: 4px solid var(--primary);
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0;
+  font-style: italic;
+}
+
+/* Table */
+.ck-editor__editable table, .ck-content table { border-collapse: collapse; margin: 0.75rem 0; width: auto; }
+.ck-editor__editable table td, .ck-editor__editable table th,
+.ck-content table td,          .ck-content table th {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.75rem;
+  min-width: 60px;
+}
+.ck-editor__editable table th, .ck-content table th { font-weight: 600; background: var(--bg); }
+
+/* Image */
+.ck-editor__editable img, .ck-content img { max-width: 100%; height: auto; border-radius: var(--radius-sm); }
+
+/* Code */
+.ck-editor__editable code, .ck-content code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  font-size: 0.88em;
+  font-family: "Consolas", monospace;
+}
+.ck-editor__editable pre, .ck-content pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: "Consolas", monospace;
+  font-size: 0.88em;
+}
+
+/* ── Flex utilities ────────────────────────────────────── */
+.d-flex          { display: flex; }
+.align-items-center { align-items: center; }
+.justify-content-center { justify-content: center; }
+.justify-content-between { justify-content: space-between; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mt-3 { margin-top: 0.75rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.text-center { text-align: center; }
