@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.soaeng.happyhouse.board.dao.BoardDao">
+
+    <!-- ── 게시글 ──────────────────────────────────────────────── -->
+
+    <insert id="insertBoard" parameterType="map"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO board (username, title, content, read_count, created_date, updated_date)
+        VALUES (#{username}, #{title}, #{content}, 0, NOW(), NOW())
+    </insert>
+
+    <update id="updateBoard" parameterType="map">
+        UPDATE board
+        SET title = #{title}, content = #{content}, updated_date = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBoard" parameterType="long">
+        DELETE FROM board WHERE id = #{id}
+    </delete>
+
+    <select id="getBoardDetail" parameterType="long"
+            resultType="com.soaeng.happyhouse.board.dto.response.BoardDto">
+        SELECT b.id, b.username, u.nickname, u.profile_image_url,
+               b.title, b.content, b.read_count, b.created_date
+        FROM board b
+        JOIN user u ON b.username = u.username
+        WHERE b.id = #{id}
+    </select>
+
+    <select id="getBoardList" parameterType="com.soaeng.happyhouse.board.dto.request.BoardParamDto"
+            resultType="com.soaeng.happyhouse.board.dto.response.BoardDto">
+        SELECT b.id, b.username, u.nickname, b.title, b.read_count, b.created_date
+        FROM board b
+        JOIN user u ON b.username = u.username
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        AND b.title LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'content'">
+                        AND b.content LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <otherwise>
+                        AND (b.title LIKE CONCAT('%', #{keyword}, '%')
+                          OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY b.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getBoardCount" parameterType="com.soaeng.happyhouse.board.dto.request.BoardParamDto"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM board b
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        AND b.title LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="searchType == 'content'">
+                        AND b.content LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <otherwise>
+                        AND (b.title LIKE CONCAT('%', #{keyword}, '%')
+                          OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </select>
+
+    <!-- ── 파일 ──────────────────────────────────────────────── -->
+
+    <insert id="insertBoardFile" parameterType="map">
+        INSERT INTO board_file (board_id, file_name, file_size, file_content_type, file_url, created_date)
+        VALUES (#{boardId}, #{fileName}, #{fileSize}, #{fileContentType}, #{fileUrl}, NOW())
+    </insert>
+
+    <select id="getBoardFileList" parameterType="long"
+            resultType="com.soaeng.happyhouse.board.dto.response.BoardFileDto">
+        SELECT id, board_id, file_name, file_size, file_content_type, file_url, created_date
+        FROM board_file
+        WHERE board_id = #{boardId}
+    </select>
+
+    <select id="getBoardFileUrls" parameterType="long" resultType="string">
+        SELECT file_url FROM board_file WHERE board_id = #{boardId}
+    </select>
+
+    <delete id="deleteBoardFiles" parameterType="long">
+        DELETE FROM board_file WHERE board_id = #{boardId}
+    </delete>
+
+    <!-- ── 조회수 ─────────────────────────────────────────────── -->
+
+    <select id="countUserRead" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM board_user_read
+        WHERE board_id = #{boardId} AND username = #{username}
+    </select>
+
+    <insert id="insertUserRead" parameterType="map">
+        INSERT INTO board_user_read (board_id, username) VALUES (#{boardId}, #{username})
+    </insert>
+
+    <update id="updateReadCount" parameterType="long">
+        UPDATE board SET read_count = read_count + 1 WHERE id = #{id}
+    </update>
+
+    <!-- ── 댓글 ──────────────────────────────────────────────── -->
+
+    <insert id="insertReply" parameterType="map"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO reply (board_id, username, content, created_date)
+        VALUES (#{boardId}, #{username}, #{content}, NOW())
+    </insert>
+
+    <update id="updateReply" parameterType="map">
+        UPDATE reply SET content = #{content} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteReply" parameterType="long">
+        DELETE FROM reply WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteRepliesByBoard" parameterType="long">
+        DELETE FROM reply WHERE board_id = #{boardId}
+    </delete>
+
+    <select id="getReplyDetail" parameterType="long"
+            resultType="com.soaeng.happyhouse.board.dto.response.ReplyDto">
+        SELECT r.id, r.board_id, r.username, u.nickname, r.content, r.created_date
+        FROM reply r
+        JOIN user u ON r.username = u.username
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="getReplyList" parameterType="long"
+            resultType="com.soaeng.happyhouse.board.dto.response.ReplyDto">
+        SELECT r.id, r.board_id, r.username, u.nickname, r.content, r.created_date
+        FROM reply r
+        JOIN user u ON r.username = u.username
+        WHERE r.board_id = #{boardId}
+        ORDER BY r.id ASC
+    </select>
+
+</mapper>
