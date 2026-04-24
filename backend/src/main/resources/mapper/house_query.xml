@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.soaeng.happyhouse.house.dao.HouseDao">
+
+    <!--  # 지역 코드  -->
+    <!--  법정동  -->
+    <select id="getBaseAddress" parameterType="long"
+            resultType="com.soaeng.happyhouse.house.dto.response.BaseAddressDto">
+        SELECT *
+        FROM base_address
+        WHERE dong_code = #{dongCode}
+    </select>
+
+    <!--  법정동 일괄 조회 (N+1 방지)  -->
+    <select id="getBaseAddressByDongCodes" parameterType="list"
+            resultType="com.soaeng.happyhouse.house.dto.response.BaseAddressDto">
+        SELECT *
+        FROM base_address
+        WHERE dong_code IN
+        <foreach item="dongCode" collection="list" open="(" separator="," close=")">
+            #{dongCode}
+        </foreach>
+    </select>
+
+    <!--  시/도  -->
+    <select id="getSidoList" resultType="com.soaeng.happyhouse.house.dto.response.SidoDto">
+        SELECT sido_code, sido_name
+        FROM sido_code
+    </select>
+
+    <!--  구/군  -->
+    <select id="getGugunList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.GugunDto">
+        SELECT gugun_code, gugun_name
+        FROM gugun_code
+        JOIN sido_code ON SUBSTRING(gugun_code, 1, 2) = SUBSTRING(sido_code, 1, 2)
+        WHERE sido_code = #{sidoCode}
+        ORDER BY gugun_name
+    </select>
+
+    <!--  동  -->
+    <select id="getDongList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.DongDto">
+        SELECT dong_code, dong_name
+        FROM dong_code AS dc
+        JOIN gugun_code AS gc ON dc.gugun_name = gc.gugun_name
+        WHERE gugun_code = #{gugunCode}
+        ORDER BY dong_name
+    </select>
+
+    <select id="getAdstrdCode" parameterType="long" resultType="string">
+        SELECT adstrd_code
+        FROM dong_code
+        WHERE dong_code = #{dongCode}
+    </select>
+
+    <select id="getGugunCode" parameterType="long" resultType="long">
+        SELECT gugun_code
+        FROM gugun_code
+        WHERE gugun_name = (SELECT gugun_name FROM dong_code WHERE dong_code = #{dongCode})
+    </select>
+
+    <!--  # 매물별 최근 거래 목록 (동적 필터 통합)  -->
+    <!--
+        필터 우선순위: dongCode > gugunCode > sidoCode > 전체
+        keyword는 독립 조건으로 조합 가능
+    -->
+    <select id="getHouseList" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+        SELECT *
+        FROM (
+            SELECT hd.no,
+                   hi.apt_code,
+                   hi.apt_name,
+                   hi.dong_code,
+                   hi.build_year,
+                   hd.deal_year,
+                   hd.deal_month,
+                   hd.deal_day,
+                   hd.deal_amount,
+                   hi.lat,
+                   hi.lng
+            FROM house_deal hd
+            JOIN house_info hi ON hd.apt_code = hi.apt_code
+            ORDER BY hd.no DESC
+            LIMIT 18446744073709551615
+        ) hh
+        <where>
+            <if test="dongCode > 0">
+                AND dong_code = #{dongCode}
+            </if>
+            <if test="dongCode == 0 and gugunCode > 0">
+                AND SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
+            </if>
+            <if test="dongCode == 0 and gugunCode == 0 and sidoCode > 0">
+                AND SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND apt_name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        GROUP BY apt_code
+        LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <!--  매물 총 수 (동적 필터 통합)  -->
+    <select id="getHouseCount" parameterType="com.soaeng.happyhouse.house.dto.request.HouseParamDto"
+            resultType="int">
+        SELECT COUNT(DISTINCT apt_code)
+        FROM house_info
+        <where>
+            <if test="dongCode > 0">
+                AND dong_code = #{dongCode}
+            </if>
+            <if test="dongCode == 0 and gugunCode > 0">
+                AND SUBSTRING(dong_code, 1, 5) = SUBSTRING(#{gugunCode}, 1, 5)
+            </if>
+            <if test="dongCode == 0 and gugunCode == 0 and sidoCode > 0">
+                AND SUBSTRING(dong_code, 1, 2) = SUBSTRING(#{sidoCode}, 1, 2)
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND apt_name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!--  # 거래 목록  -->
+    <!--  아파트별 거래 상세 목록  -->
+    <select id="getHouseDealList" parameterType="long" resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+        SELECT hd.no,
+               hi.apt_code,
+               hi.apt_name,
+               hi.dong_code,
+               hi.build_year,
+               hd.area,
+               hd.floor,
+               hi.lat,
+               hi.lng,
+               hd.deal_year,
+               hd.deal_month,
+               hd.deal_day,
+               hd.deal_amount
+        FROM house_deal hd
+        JOIN house_info hi ON hd.apt_code = hi.apt_code
+        WHERE hd.apt_code = #{aptCode}
+        ORDER BY hd.no DESC
+    </select>
+
+    <!--  아파트별 거래 수  -->
+    <select id="getHouseDealCount" parameterType="long" resultType="int">
+        SELECT count(*)
+        FROM house_deal
+        WHERE apt_code = #{aptCode}
+    </select>
+
+    <!--  # 북마크  -->
+    <!--  아파트별 즐겨찾기  -->
+    <select id="getBookmarkHouseList" parameterType="list"
+            resultType="com.soaeng.happyhouse.house.dto.response.HouseDto">
+        SELECT *
+        FROM (
+            SELECT hd.no,
+                   hi.apt_code,
+                   hi.apt_name,
+                   hi.dong_code,
+                   hi.build_year,
+                   hd.deal_year,
+                   hd.deal_month,
+                   hd.deal_day,
+                   hd.deal_amount,
+                   hi.lat,
+                   hi.lng
+            FROM house_deal hd
+            JOIN house_info hi ON hd.apt_code = hi.apt_code
+            WHERE hd.apt_code IN
+            <foreach item="aptCode" collection="aptCodes" open="(" separator="," close=")">
+                #{aptCode}
+            </foreach>
+            ORDER BY hd.no DESC
+            LIMIT 18446744073709551615
+        ) hh
+        GROUP BY apt_code
+    </select>
+
+    <!--  지역별 즐겨찾기  -->
+    <select id="getBookmarkRegionList" parameterType="list"
+            resultType="com.soaeng.happyhouse.house.dto.response.BaseAddressDto">
+        SELECT sido_name, gugun_name, dong_name, dong_code
+        FROM base_address
+        WHERE dong_code IN
+        <foreach item="dongCode" collection="dongCodes" open="(" separator="," close=")">
+            #{dongCode}
+        </foreach>
+        ORDER BY dong_name
+    </select>
+
+    <!--  지역별 인구 통계  -->
+    <select id="getPopulation" parameterType="string"
+            resultType="com.soaeng.happyhouse.house.dto.response.PopulationDto">
+        SELECT *
+        FROM population
+        WHERE adstrd_code = #{adstrdCode}
+    </select>
+
+</mapper>
