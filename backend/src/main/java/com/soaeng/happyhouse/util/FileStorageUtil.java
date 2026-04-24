@@ -123,11 +123,18 @@ public class FileStorageUtil {
 
     public ResponseEntity<Resource> getFile(String folderName, String fileName) {
 
-        String folderPath = uploadPath + File.separator + folderName;
-        Resource resource = new FileSystemResource(folderPath + File.separator + fileName);
+        // 경로 탐색(Path Traversal) 차단: 파일명만 추출하고 절대 경로 내부 여부 검증
+        String safeFileName = Paths.get(fileName).getFileName().toString();
+        Path folderPath = Paths.get(uploadPath, folderName).toAbsolutePath().normalize();
+        Path resolvedPath = folderPath.resolve(safeFileName).normalize();
+        if (!resolvedPath.startsWith(folderPath)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Resource resource = new FileSystemResource(resolvedPath);
 
         if (!resource.exists()) {
-            resource = new FileSystemResource(folderPath + File.separator + "default.png");
+            resource = new FileSystemResource(folderPath.resolve("default.png"));
         }
 
         HttpHeaders headers = new HttpHeaders();

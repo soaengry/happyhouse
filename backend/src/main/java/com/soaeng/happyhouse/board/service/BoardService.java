@@ -15,9 +15,9 @@ public interface BoardService {
 
     BoardDto getBoard(Long id, String username);
 
-    void updateBoard(Long id, MultipartHttpServletRequest request);
+    void updateBoard(Long id, String username, MultipartHttpServletRequest request);
 
-    void deleteBoard(Long id);
+    void deleteBoard(Long id, String username);
 
     Map<String, Object> getBoardList(BoardParamDto param);
 

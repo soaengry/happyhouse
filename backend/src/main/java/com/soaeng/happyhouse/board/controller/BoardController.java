@@ -53,14 +53,17 @@ public class BoardController {
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<Void> updateBoard(
             @PathVariable Long id,
+            @AuthenticationPrincipal UserEntity user,
             MultipartHttpServletRequest request) {
-        boardService.updateBoard(id, request);
+        boardService.updateBoard(id, user.getUsername(), request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
-        boardService.deleteBoard(id);
+    public ResponseEntity<Void> deleteBoard(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserEntity user) {
+        boardService.deleteBoard(id, user.getUsername());
         return ResponseEntity.ok().build();
     }
 

@@ -70,7 +70,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
-    public void updateBoard(Long id, MultipartHttpServletRequest request) {
+    public void updateBoard(Long id, String username, MultipartHttpServletRequest request) {
+        BoardDto board = boardDao.getBoardDetail(id);
+        if (board == null || !board.getUsername().equals(username)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
         Map<String, Object> param = new HashMap<>();
         param.put("id", id);
         param.put("title", request.getParameter("title"));
@@ -92,7 +97,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
-    public void deleteBoard(Long id) {
+    public void deleteBoard(Long id, String username) {
+        BoardDto board = boardDao.getBoardDetail(id);
+        if (board == null || !board.getUsername().equals(username)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
         List<String> fileUrls = boardDao.getBoardFileUrls(id);
         if (!fileUrls.isEmpty()) {
             fileStorageUtil.deleteFiles(BOARD_FOLDER, fileUrls);
