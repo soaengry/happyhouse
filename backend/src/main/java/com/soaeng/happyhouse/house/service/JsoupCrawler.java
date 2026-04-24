@@ -4,16 +4,17 @@ import com.soaeng.happyhouse.house.dao.HouseDao;
 import com.soaeng.happyhouse.house.dto.response.NewsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -21,46 +22,60 @@ import java.util.List;
 public class JsoupCrawler {
 
     private final HouseDao houseDao;
-    private static final String REGION_URL = "https://land.naver.com/news/region.naver";
 
+    private static final String REGION_URL = "https://land.naver.com/news/region.naver";
+    private static final int CONNECT_TIMEOUT_MS = 5000;
+    private static final int IMAGE_TIMEOUT_MS = 3000;
+
+    @Cacheable(value = "news", key = "#dongCode")
     public List<NewsDto> crawlNews(Long dongCode) {
         Long gugunCode = houseDao.getGugunCode(dongCode);
-        Connection conn = Jsoup.connect(REGION_URL + (dongCode == 0 ? "" : "?dvsn_no=" + gugunCode));
+        String url = REGION_URL + (dongCode == 0 ? "" : "?dvsn_no=" + gugunCode);
 
         try {
-            Document document = conn.get();
+            Document document = Jsoup.connect(url).timeout(CONNECT_TIMEOUT_MS).get();
             return getRegionNews(document);
-
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            log.error("뉴스 크롤링 실패 dongCode={}: {}", dongCode, e.getMessage());
+            return List.of();
         }
     }
 
-    public List<NewsDto> getRegionNews(Document document) {
-        List<NewsDto> newsList = new ArrayList<>();
+    private List<NewsDto> getRegionNews(Document document) {
         Elements dl = document.select(".section_headline .headline_list li dl");
 
+        List<String> urls = new ArrayList<>();
+        List<NewsDto.NewsDtoBuilder> builders = new ArrayList<>();
+
         for (Element element : dl) {
-            String url = element.select("dt a[target=_blank]").attr("href");
+            String articleUrl = element.select("dt a[target=_blank]").attr("href");
             String title = element.select("dt a[target=_blank]").text();
-            String img = fetchFirstImage(url);
             Element dd = element.selectFirst("dd");
-            String content = dd.html();
-            content = content.split("<span ")[0];
+            String content = dd.html().split("<span ")[0];
             String publish = dd.select("span.writing").text();
             String date = dd.select("span.date").text();
 
-            NewsDto dto = NewsDto.builder()
-                    .url(url)
+            urls.add(articleUrl);
+            builders.add(NewsDto.builder()
+                    .url(articleUrl)
                     .title(title)
                     .content(content)
                     .publish(publish)
-                    .date(date)
-                    .img(img)
-                    .build();
+                    .date(date));
+        }
 
-            newsList.add(dto);
+        // 모든 기사 이미지를 병렬로 fetch
+        List<CompletableFuture<String>> imageFutures = urls.stream()
+                .map(u -> CompletableFuture.supplyAsync(() -> fetchFirstImage(u)))
+                .toList();
+
+        List<String> images = imageFutures.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        List<NewsDto> newsList = new ArrayList<>();
+        for (int i = 0; i < builders.size(); i++) {
+            newsList.add(builders.get(i).img(images.get(i)).build());
         }
 
         return newsList;
@@ -68,17 +83,14 @@ public class JsoupCrawler {
 
     private String fetchFirstImage(String newsUrl) {
         try {
-            Document doc = Jsoup.connect(newsUrl).get();
+            Document doc = Jsoup.connect(newsUrl).timeout(IMAGE_TIMEOUT_MS).get();
             Element article = doc.selectFirst("#newsct_article");
-
             if (article != null) {
                 Element imgTag = article.selectFirst("img");
-                if (imgTag != null) {
-                    return imgTag.attr("data-src"); // 첫 번째 이미지 URL 반환
-                }
+                if (imgTag != null) return imgTag.attr("data-src");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("이미지 fetch 실패 url={}: {}", newsUrl, e.getMessage());
         }
         return null;
     }
